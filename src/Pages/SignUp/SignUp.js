@@ -19,7 +19,7 @@ function SignUp() {
     return (
         <>
             <StyledFormWrapper>
-                <StyledForm>
+                <StyledForm autoComplete="off">
                     {formStep === 1 && (
                         <section>
                             <StyledLeftBackIcon

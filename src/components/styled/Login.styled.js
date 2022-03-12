@@ -46,7 +46,7 @@ const StyledLabel = styled.label`
 const StyledInput = styled.input`
     position: absolute;
     border: 2px solid var(--input-color);
-    border-radius: 0.75rem;
+    border-radius: var(--div-border-radius);
     top: 0;
     left: 0;
     width: 100%;
@@ -97,7 +97,7 @@ const StyledButton = styled.button`
     font-family: inherit;
     font-size: var(--normal-font-size);
     font-weight: var(--fw-bold);
-    border-radius: 0.75rem;
+    border-radius: var(--div-border-radius);
     cursor: pointer;
     transition: 0.2s;
 

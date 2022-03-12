@@ -7,11 +7,11 @@ function Login() {
     return (
         <>
             <StyledFormWrapper>
-                <StyledForm>
+                <StyledForm autoComplete="off">
                     <StyledTitle>Welcome!</StyledTitle>
                     <StyledFormDiv>
                         <StyledInput
-                            type="text"
+                            type="search"
                             id="email"
                             placeholder=" "
                         />
