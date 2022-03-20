@@ -1,19 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyledButton, StyledForm, StyledFormDiv, StyledFormWrapper, StyledInput, StyledLabel, StyledLink } from '../../components/styled/Login.styled';
 import { StyledTitle } from '../../components/styled/StyledTitle';
 
 
 function Login() {
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+    const onChange = (e) => {
+        setFormData((prevState) => ({
+            ...prevState,
+            [e.target.name]: e.target.value,
+        }));
+    };
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+    };
+
+    const { email, password } = formData;
+
     return (
         <>
             <StyledFormWrapper>
-                <StyledForm autoComplete="off">
+                <StyledForm autoComplete="off" onSubmit={onSubmit}>
                     <StyledTitle>Welcome!</StyledTitle>
                     <StyledFormDiv>
                         <StyledInput
-                            type="search"
+                            type="email"
                             id="email"
                             placeholder=" "
+                            name="email"
+                            value={email}
+                            onChange={onChange}
                         />
                         <StyledLabel className="form__label" htmlFor="email">Email</StyledLabel>
                     </StyledFormDiv>
@@ -22,6 +42,9 @@ function Login() {
                             type="password"
                             id="password"
                             placeholder=" "
+                            name="password"
+                            value={password}
+                            onChange={onChange}
                         />
                         <StyledLabel className="form__label" htmlFor="password">Password</StyledLabel>
                     </StyledFormDiv>

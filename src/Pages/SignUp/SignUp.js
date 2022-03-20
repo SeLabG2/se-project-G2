@@ -3,23 +3,35 @@ import styled from 'styled-components';
 import { StyledButton, StyledForm, StyledFormDiv, StyledFormWrapper, StyledInput, StyledLabel } from '../../components/styled/Login.styled';
 import { StyledTitle } from '../../components/styled/StyledTitle';
 
-const StyledLeftBackIcon = styled.svg`
-    width: 1.5em;
-    cursor: pointer;
-    margin-bottom: var(--field-margin);
 
-    &:hover {
-        color: var(--secondary-color);
-    }
-`
 
 function SignUp() {
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        university: ''
+    });
     const [formStep, setFormStep] = useState(0);
+
+    const { username, email, password, confirmPassword, university } = formData;
+
+    const onChange = (e) => {
+        setFormData((prevState) => ({
+            ...prevState,
+            [e.target.name]: e.target.value,
+        }));
+    };
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+    };
 
     return (
         <>
             <StyledFormWrapper>
-                <StyledForm autoComplete="off">
+                <StyledForm autoComplete="off" onSubmit={onSubmit}>
                     {formStep === 1 && (
                         <section>
                             <StyledLeftBackIcon
@@ -42,6 +54,9 @@ function SignUp() {
                                     type="text"
                                     id="university"
                                     placeholder=" "
+                                    name="university"
+                                    value={university}
+                                    onChange={onChange}
                                 />
                                 <StyledLabel
                                     className="form__label"
@@ -62,8 +77,27 @@ function SignUp() {
                             <StyledFormDiv>
                                 <StyledInput
                                     type="text"
+                                    id="username"
+                                    placeholder=" "
+                                    name="username"
+                                    value={username}
+                                    onChange={onChange}
+                                />
+                                <StyledLabel
+                                    className="form__label"
+                                    htmlFor="username"
+                                >
+                                    Username
+                                </StyledLabel>
+                            </StyledFormDiv>
+                            <StyledFormDiv>
+                                <StyledInput
+                                    type="text"
                                     id="email"
                                     placeholder=" "
+                                    name="email"
+                                    value={email}
+                                    onChange={onChange}
                                 />
                                 <StyledLabel
                                     className="form__label"
@@ -77,6 +111,9 @@ function SignUp() {
                                     type="password"
                                     id="password"
                                     placeholder=" "
+                                    name="password"
+                                    value={password}
+                                    onChange={onChange}
                                 />
                                 <StyledLabel
                                     className="form__label"
@@ -88,12 +125,15 @@ function SignUp() {
                             <StyledFormDiv>
                                 <StyledInput
                                     type="password"
-                                    id="confirm-password"
+                                    id="confirmPassword"
                                     placeholder=" "
+                                    name="confirmPassword"
+                                    value={confirmPassword}
+                                    onChange={onChange}
                                 />
                                 <StyledLabel
                                     className="form__label"
-                                    htmlFor="confirm-password"
+                                    htmlFor="confirmPassword"
                                 >
                                     Confirm Password
                                 </StyledLabel>
@@ -108,3 +148,13 @@ function SignUp() {
 }
 
 export default SignUp;
+
+const StyledLeftBackIcon = styled.svg`
+    width: 1.5em;
+    cursor: pointer;
+    margin-bottom: var(--field-margin);
+
+    &:hover {
+        color: var(--secondary-color);
+    }
+`

@@ -1,13 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { configureStore } from '@reduxjs/toolkit';
+import { store } from "./app/store";
 import { Provider } from 'react-redux';
 import GlobalStyles from './components/styled/GlobalStyles';
-
-const store = configureStore({
-  reducer: {}
-})
 
 ReactDOM.render(
   <React.StrictMode>

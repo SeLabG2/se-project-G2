@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { media } from '../../helper/mediaQuery';
+import { media } from '../../common/helpers/mediaQuery';
 
 const SidebarContainer = styled.div`
     height: 100%;
