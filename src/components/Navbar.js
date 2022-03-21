@@ -1,28 +1,40 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
-import { logout, selectUser } from '../features/user/userSlice';
-import { logoutUser, useAuth } from '../firebase/firebase';
+import { logout, reset, selectUser, selectUserStatus } from '../features/user/userSlice';
 
 
 function Navbar() {
-    const navigate = useNavigate();
-    const currentUser = useAuth();
     const user = useSelector(selectUser);
+    const { isError, isSuccess, message } = useSelector(selectUserStatus);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isError) {
+            toast(message, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+
+        if (isSuccess || !user) {
+            navigate('/');
+        }
+
+        dispatch(reset());
+    }, [user, isError, isSuccess, message, navigate, dispatch]);
+
 
     const handleLogout = async () => {
-        console.log('global user before logout : ', user);
-        try {
-            await logoutUser();
-            console.log('user logged out : ', currentUser);
-            dispatch(logout());
-            console.log('global user after logout : ', user);
-            navigate('/login');
-        } catch (err) {
-            console.log(err.message);
-        }
+        dispatch(logout());
     }
 
     return (

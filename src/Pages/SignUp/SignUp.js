@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { StyledButton, StyledForm, StyledFormDiv, StyledFormWrapper, StyledInput, StyledLabel, StyledLink } from '../../components/styled/Login.styled';
 import { StyledTitle } from '../../components/styled/StyledTitle';
-import { login, logout, selectUser } from '../../features/user/userSlice';
-import {
-    logoutUser,
-    signupUser,
-    useAuth
-} from '../../firebase/firebase';
+import { reset, selectUser, selectUserStatus, signup } from '../../features/user/userSlice';
 
 
 function SignUp() {
@@ -20,14 +16,34 @@ function SignUp() {
         confirmPassword: '',
         university: ''
     });
-    const [formStep, setFormStep] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
-    const currentUser = useAuth();
-    const user = useSelector(selectUser);
-    const dispatch = useDispatch();
-
     const { username, email, password, confirmPassword, university } = formData;
+    const [formStep, setFormStep] = useState(0);
+
+    const user = useSelector(selectUser);
+    const { isLoading, isError, isSuccess, message } = useSelector(selectUserStatus);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isError) {
+            toast(message, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+
+        if (isSuccess || user) {
+            navigate('/');
+        }
+
+        dispatch(reset());
+    }, [user, isError, isSuccess, message, navigate, dispatch]);
+
 
     const onChange = (e) => {
         setFormData((prevState) => ({
@@ -41,24 +57,11 @@ function SignUp() {
         // validate the form here
 
         // now just create new user and store them in firebase
-        setIsLoading(true);
-        console.log('global user before signup : ', user);
-        try {
-            const userCredentials = await signupUser(email, password);
-            console.log('user created : ', userCredentials.user);
-            dispatch(login({
-                email: userCredentials.user.email,
-                uid: userCredentials.user.uid,
-            }));
-            console.log('global user after signup but before its logout : ', user);
-            await logoutUser();
-            dispatch(logout());
-            console.log('global user after signup and after its logout : ', user);
-            navigate('/login');
-        } catch (err) {
-            console.log(err.message);
-        }
-        setIsLoading(false);
+        const userData = {
+            email,
+            password
+        };
+        dispatch(signup(userData));
     };
 
     return (

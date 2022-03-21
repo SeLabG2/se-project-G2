@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { StyledButton, StyledForm, StyledFormDiv, StyledFormWrapper, StyledInput, StyledLabel, StyledLink } from '../../components/styled/Login.styled';
 import { StyledTitle } from '../../components/styled/StyledTitle';
-import { login, selectUser } from '../../features/user/userSlice';
-import { loginUser, useAuth } from '../../firebase/firebase';
+import { login, reset, selectUser, selectUserStatus } from '../../features/user/userSlice';
 
 
 function Login() {
@@ -12,11 +12,30 @@ function Login() {
         email: '',
         password: ''
     });
-    const [isLoading, setIsLoading] = useState(false);
-    const currentUser = useAuth();
     const user = useSelector(selectUser);
+    const { isLoading, isError, isSuccess, message } = useSelector(selectUserStatus);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isError) {
+            toast(message, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+
+        if (isSuccess || user) {
+            navigate('/');
+        }
+
+        dispatch(reset());
+    }, [user, isError, isSuccess, message, navigate, dispatch]);
 
     const onChange = (e) => {
         setFormData((prevState) => ({
@@ -28,22 +47,7 @@ function Login() {
     const onSubmit = async (e) => {
         e.preventDefault();
 
-        setIsLoading(true);
-        console.log('current user : ', currentUser);
-        console.log('global user before login : ', user);
-        try {
-            const userCredentials = await loginUser(email, password);
-            console.log('user logged in : ', userCredentials.user);
-            dispatch(login({
-                email: userCredentials.user.email,
-                uid: userCredentials.user.uid,
-            }));
-            console.log('global user after login : ', user);
-            navigate('/');
-        } catch (err) {
-            console.log(err.message);
-        }
-        setIsLoading(false);
+        dispatch(login(formData));
     };
 
     const { email, password } = formData;
