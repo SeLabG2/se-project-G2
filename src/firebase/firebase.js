@@ -3,11 +3,11 @@ import { initializeApp } from 'firebase/app';
 import {
     getAuth,
     createUserWithEmailAndPassword,
-    updateProfile,
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signOut
 } from 'firebase/auth';
+import { useEffect, useState } from 'react';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -25,12 +25,46 @@ const app = initializeApp(firebaseConfig);
 // create the auth object
 const auth = getAuth(app);
 
+// function to signup, returns a promise
+function signupUser(email, password) {
+    return createUserWithEmailAndPassword(auth, email, password);
+}
+
+// function to login, returns a promise
+function loginUser(email, password) {
+    return signInWithEmailAndPassword(auth, email, password);
+}
+
+// function to logout, returns a promise
+function logoutUser() {
+    return signOut(auth);
+}
+
+// function to listen to changes in user
+function useAuth() {
+    const [currentUser, setCurrentUser] = useState();
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, user => setCurrentUser(user));
+
+        return () => {
+            unsubscribe();
+        }
+    }, []);
+
+
+    return currentUser;
+}
+
 // Export all the required services
 export {
     auth,
     createUserWithEmailAndPassword,
-    updateProfile,
     onAuthStateChanged,
     signInWithEmailAndPassword,
-    signOut
+    signOut,
+    signupUser,
+    loginUser,
+    logoutUser,
+    useAuth
 };

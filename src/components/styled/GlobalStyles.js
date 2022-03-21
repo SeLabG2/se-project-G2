@@ -1,12 +1,12 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
-    @import url('https://fonts.googleapis.com/css2?family=Acme&family=Bebas+Neue&display=swap');
+    ${'' /* @import url('https://fonts.googleapis.com/css2?family=Acme&family=Bebas+Neue&display=swap'); */}
 
     :root {
         ${'' /* CSS VARIABLES */}
 
-        --font-base: 'Acme', sans-serif;
+        --font-base: sans-serif;
 
         --normal-font-size: 1rem;
         --small-font-size: 0.75rem;

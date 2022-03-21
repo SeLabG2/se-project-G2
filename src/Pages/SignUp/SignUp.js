@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { StyledButton, StyledForm, StyledFormDiv, StyledFormWrapper, StyledInput, StyledLabel } from '../../components/styled/Login.styled';
+import { StyledButton, StyledForm, StyledFormDiv, StyledFormWrapper, StyledInput, StyledLabel, StyledLink } from '../../components/styled/Login.styled';
 import { StyledTitle } from '../../components/styled/StyledTitle';
-
+import { login, logout, selectUser } from '../../features/user/userSlice';
+import {
+    logoutUser,
+    signupUser,
+    useAuth
+} from '../../firebase/firebase';
 
 
 function SignUp() {
@@ -14,6 +21,11 @@ function SignUp() {
         university: ''
     });
     const [formStep, setFormStep] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+    const currentUser = useAuth();
+    const user = useSelector(selectUser);
+    const dispatch = useDispatch();
 
     const { username, email, password, confirmPassword, university } = formData;
 
@@ -24,8 +36,29 @@ function SignUp() {
         }));
     };
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
+        // validate the form here
+
+        // now just create new user and store them in firebase
+        setIsLoading(true);
+        console.log('global user before signup : ', user);
+        try {
+            const userCredentials = await signupUser(email, password);
+            console.log('user created : ', userCredentials.user);
+            dispatch(login({
+                email: userCredentials.user.email,
+                uid: userCredentials.user.uid,
+            }));
+            console.log('global user after signup but before its logout : ', user);
+            await logoutUser();
+            dispatch(logout());
+            console.log('global user after signup and after its logout : ', user);
+            navigate('/login');
+        } catch (err) {
+            console.log(err.message);
+        }
+        setIsLoading(false);
     };
 
     return (
@@ -138,9 +171,12 @@ function SignUp() {
                                     Confirm Password
                                 </StyledLabel>
                             </StyledFormDiv>
-                            <StyledButton type="submit">Sign-Up</StyledButton>
+                            <StyledButton disabled={isLoading} type="submit">Sign-Up</StyledButton>
                         </section>
                     )}
+
+                    <p className='form__login-para'>Already have an account? </p>
+                    <StyledLink to="/login">Login here!</StyledLink>
                 </StyledForm>
             </StyledFormWrapper>
         </>

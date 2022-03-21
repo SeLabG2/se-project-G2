@@ -13,12 +13,12 @@ const StyledForm = styled.form`
     background-color: var(--white-color); 
     border-radius: 1.2rem;
     width: min(90%, 400px);
-    padding: 4em 3em;
+    padding: 3em;
     box-shadow: -1px 2px 38px 8px rgba(228, 229, 234, 1);
     -webkit-box-shadow: -1px 2px 38px 8px rgba(228, 229, 234, 1);
     -moz-box-shadow: -1px 2px 38px 8px rgba(228, 229, 234, 1);
 
-    & .form__signup-para {
+    & .form__signup-para, & .form__login-para {
         margin-bottom: 0.1em;
     }
 `
@@ -55,6 +55,7 @@ const StyledInput = styled.input`
     padding: 0.75em;
     outline: none;
     z-index: 1;
+    color: var(--black-color);
 
     &:focus, &:hover {
         border: 2px solid var(--secondary-color);
@@ -89,7 +90,7 @@ const StyledButton = styled.button`
     width: 100%;
     height: var(--input-field-size);
     padding: 0.5em auto;
-    margin-bottom: 2em;
+    margin-bottom: 1.5em;
     outline: none;
     border: none;
     background-color: var(--secondary-color);
