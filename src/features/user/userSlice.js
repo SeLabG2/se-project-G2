@@ -1,7 +1,8 @@
 // features/userSlice.js
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { loginUser, logoutUser, signupUser } from '../../firebase/firebase';
+import { loginUser, logoutUser, signupUser } from '../../firebase/firebase-auth';
+import { setDoc, getDoc, getDocRefById } from '../../firebase/firebase-firestore';
 
 // get user from local storage
 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -16,13 +17,19 @@ const initialState = {
 
 export const signup = createAsyncThunk('user/signup', async (user, thunkAPI) => {
     try {
+        const { password, ...userDataWithoutPassword } = user;
+
+        // signup new user with firebase auth
         const userCredentials = await signupUser(user.email, user.password);
-        const userData = {
-            uid: userCredentials.user.uid,
-            email: userCredentials.user.email,
-        };
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        return userData;
+        const uid = userCredentials.user.uid;
+        const newUserData = { ...userDataWithoutPassword, uid };
+
+        // store new user in database
+        const userDocRef = getDocRefById(uid, 'users');
+        await setDoc(userDocRef, userDataWithoutPassword);
+
+        localStorage.setItem('currentUser', JSON.stringify(newUserData));
+        return newUserData;
 
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message)
@@ -35,10 +42,13 @@ export const signup = createAsyncThunk('user/signup', async (user, thunkAPI) => 
 export const login = createAsyncThunk('user/login', async (user, thunkAPI) => {
     try {
         const userCredentials = await loginUser(user.email, user.password);
-        const userData = {
-            uid: userCredentials.user.uid,
-            email: userCredentials.user.email,
-        };
+        const uid = userCredentials.user.uid;
+
+        // get logged in user with given id from database
+        const userDocRef = getDocRefById(uid, 'users');
+        const docSnap = await getDoc(userDocRef);
+        const userData = docSnap.data();
+
         localStorage.setItem('currentUser', JSON.stringify(userData));
         return userData;
 

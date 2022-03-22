@@ -14,9 +14,10 @@ const SidebarContainer = styled.div`
         inset: 0 30% 0 0;
         z-index: 9999;
         background-color: white;
-        width: 75vw;
+        width: min(75vw, 18em);
         border-right: 5px solid var(--gray-color);
         
+
         ${media.mobileSmall} {
             width: 100vw;
         }

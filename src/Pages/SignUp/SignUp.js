@@ -6,23 +6,41 @@ import styled from 'styled-components';
 import { StyledButton, StyledForm, StyledFormDiv, StyledFormWrapper, StyledInput, StyledLabel, StyledLink } from '../../components/styled/Login.styled';
 import { StyledTitle } from '../../components/styled/StyledTitle';
 import { reset, selectUser, selectUserStatus, signup } from '../../features/user/userSlice';
+import { getAllDocsFrom, getColRef } from '../../firebase/firebase-firestore';
 
 
 function SignUp() {
+    const [allUniList, setAllUniList] = useState([]);
     const [formData, setFormData] = useState({
         username: '',
         email: '',
         password: '',
         confirmPassword: '',
-        university: ''
+        university: '',
+        role: ''
     });
-    const { username, email, password, confirmPassword, university } = formData;
+    const { username, email, password, confirmPassword, university, role } = formData;
     const [formStep, setFormStep] = useState(0);
 
     const user = useSelector(selectUser);
     const { isLoading, isError, isSuccess, message } = useSelector(selectUserStatus);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // gets all universities from database
+        const getAllUniversities = async () => {
+            try {
+                const universityColRef = getColRef('universities');
+                const allUniversities = await getAllDocsFrom(universityColRef);
+                setAllUniList([...allUniversities]);
+            } catch (error) {
+                console.log(error.message);
+            }
+        };
+
+        getAllUniversities();
+    }, []);
 
     useEffect(() => {
         if (isError) {
@@ -56,10 +74,18 @@ function SignUp() {
         e.preventDefault();
         // validate the form here
 
+
+        // get id of university
+        const univ = allUniList.filter((uni) => university === uni.name);
+
         // now just create new user and store them in firebase
         const userData = {
+            uni_id: univ[0].id,
+            role,
+            username,
             email,
-            password
+            password,
+            class_joined: []
         };
         dispatch(signup(userData));
     };
@@ -68,7 +94,7 @@ function SignUp() {
         <>
             <StyledFormWrapper>
                 <StyledForm autoComplete="off" onSubmit={onSubmit}>
-                    {formStep === 1 && (
+                    {formStep > 0 && (
                         <section>
                             <StyledLeftBackIcon
                                 onClick={() => setFormStep((currStep) => currStep - 1)}
@@ -109,6 +135,31 @@ function SignUp() {
                         </section>
                     )}
                     {formStep === 1 && (
+                        <section>
+                            <StyledFormDiv>
+                                <StyledInput
+                                    type="text"
+                                    id="role"
+                                    placeholder=" "
+                                    name="role"
+                                    value={role}
+                                    onChange={onChange}
+                                />
+                                <StyledLabel
+                                    className="form__label"
+                                    htmlFor="role"
+                                >
+                                    Role
+                                </StyledLabel>
+                            </StyledFormDiv>
+                            <StyledButton
+                                onClick={() => setFormStep((currStep) => currStep + 1)}
+                            >
+                                Next
+                            </StyledButton>
+                        </section>
+                    )}
+                    {formStep === 2 && (
                         <section>
                             <StyledFormDiv>
                                 <StyledInput

@@ -8,7 +8,7 @@ const ContentAreaWrapper = styled.div`
     overflow-y: auto;
     /* border: 10px solid red; */
     background-color: var(--white-color);
-    border-bottom: 0.75em solid var(--primary-color);
+    /* border-bottom: 0.75em solid var(--primary-color); */
 
     ${media.desktop} {
         flex: 0.7;
