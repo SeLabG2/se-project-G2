@@ -1,6 +1,6 @@
 import React from 'react';
 import DiscussionList from '../../components/DiscussionList';
-import MainContent from '../../components/MainContent';
+import MainContent from './MainContent/MainContent';
 import { ContentAreaWrapper } from '../../components/styled/ContentArea.styled';
 
 function ContentArea() {

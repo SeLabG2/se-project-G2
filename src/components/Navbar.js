@@ -47,6 +47,7 @@ function Navbar() {
                 <button onClick={() => { dispatch(toggleContent('newClass')) }}>New Class</button>
             }
             <button onClick={() => { dispatch(toggleContent('joinClass')) }}>Join Class</button>
+            <button onClick={() => { dispatch(toggleContent('navTabs')) }}>NavTabs</button>
         </NavbarContainer>
     );
 }
