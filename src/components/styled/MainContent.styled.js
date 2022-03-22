@@ -6,7 +6,7 @@ const MainContentWrapper = styled.div`
     flex-direction: column;
     overflow-y: auto;
     /* border: 5px solid lightgreen; */
-    margin: 0.75em;
+    /* margin: 0.75em; */
     background-color: var(--primary-color);
     
     /* &::-webkit-scrollbar-track {

@@ -14,16 +14,15 @@ const PostListContainer = styled.div`
     }
 
     &::-webkit-scrollbar-track {
-        background-color: var(--white-color);        
+        background-color: var(--primary-color);        
     }
 `
 
 const StyledPostCard = styled.div`
-    /* background-color: darkgreen;
-    color: white;
+    background-color: var(--gray-color);
     margin: var(--post-card-margin);
     padding: var(--post-card-padding);
-    border-radius: var(--div-border-radius); */
+    border-radius: var(--div-border-radius);
     ${(props) => (props.color) ? "background-color: var(--gray-color);" : ""}
 
     &:hover {

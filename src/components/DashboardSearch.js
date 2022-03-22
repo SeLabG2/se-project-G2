@@ -6,8 +6,11 @@ import {
     AddPostButton,
     SearchIcon
 } from './styled/DashboardSearch.styled';
+import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
+import { useDispatch } from 'react-redux';
 
 function DashboardSearch() {
+    const dispatch = useDispatch();
     return (
         <SearchBarContainer>
             <SearchBox>
@@ -17,7 +20,7 @@ function DashboardSearch() {
                 </SearchIcon>
             </SearchBox>
             <div className="add-post-btn">
-                <AddPostButton>New Post</AddPostButton>
+                <AddPostButton onClick={() => { dispatch(toggleContent('newPost')) }}>New Post</AddPostButton>
             </div>
         </SearchBarContainer>
     );

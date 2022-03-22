@@ -13,7 +13,7 @@ const initialState = {
     isError: false,
     isSuccess: false,
     message: ''
-}
+};
 
 export const signup = createAsyncThunk('user/signup', async (user, thunkAPI) => {
     try {

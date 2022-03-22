@@ -1,8 +1,15 @@
-const media = {
-    desktop: "@media (min-width: 45em)",
-    // tabs: "@media (min-width: 35em)",
-    mobile: "@media (max-width: 45em)",
-    mobileSmall: "@media (max-width: 18em)"
+
+const mediaScreenSize = {
+    desktopMin: "45em",
+    mobileMax: "45em",
+    mobileSmallMax: "22em"
 }
 
-export { media };
+const media = {
+    desktop: `@media (min-width: ${mediaScreenSize.mobileMax})`,
+    // tabs: "@media (min-width: ${mediaScreenSize.mobileMax}",
+    mobile: `@media (max-width: ${mediaScreenSize.mobileMax})`,
+    mobileSmall: `@media (max-width: ${mediaScreenSize.mobileSmallMax})`
+}
+
+export { media, mediaScreenSize };

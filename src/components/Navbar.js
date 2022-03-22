@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { logout, reset, selectUser, selectUserStatus } from '../features/user/userSlice';
+import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
 
 
 function Navbar() {
@@ -40,6 +41,12 @@ function Navbar() {
     return (
         <NavbarContainer>
             <button onClick={handleLogout}>Logout</button>
+            {
+                user.role === "instructor"
+                &&
+                <button onClick={() => { dispatch(toggleContent('newClass')) }}>New Class</button>
+            }
+            <button onClick={() => { dispatch(toggleContent('joinClass')) }}>Join Class</button>
         </NavbarContainer>
     );
 }

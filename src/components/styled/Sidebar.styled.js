@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { media } from '../../common/helpers/mediaQuery';
+import { media, mediaScreenSize } from '../../common/helpers/mediaQuery';
 
 const SidebarContainer = styled.div`
     height: 100%;
@@ -14,7 +14,7 @@ const SidebarContainer = styled.div`
         inset: 0 30% 0 0;
         z-index: 9999;
         background-color: white;
-        width: min(75vw, 18em);
+        width: min(75vw, ${mediaScreenSize.mobileSmallMax});
         border-right: 5px solid var(--gray-color);
         
 
