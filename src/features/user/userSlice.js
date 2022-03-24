@@ -48,9 +48,10 @@ export const login = createAsyncThunk('user/login', async (user, thunkAPI) => {
         const userDocRef = getDocRefById(uid, 'users');
         const docSnap = await getDoc(userDocRef);
         const userData = docSnap.data();
+        const newUserData = { ...userData, uid };
 
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        return userData;
+        localStorage.setItem('currentUser', JSON.stringify(newUserData));
+        return newUserData;
 
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message)

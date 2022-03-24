@@ -55,7 +55,7 @@ function SignUp() {
             });
         }
 
-        if (isSuccess || user) {
+        if (isSuccess) {
             navigate('/');
         }
 

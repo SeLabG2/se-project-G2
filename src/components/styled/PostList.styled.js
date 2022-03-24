@@ -23,7 +23,7 @@ const StyledPostCard = styled.div`
     margin: var(--post-card-margin);
     padding: var(--post-card-padding);
     border-radius: var(--div-border-radius);
-    ${(props) => (props.color) ? "background-color: var(--gray-color);" : ""}
+    ${(props) => (props.color) ? "background-color: var(--white-color);" : ""}
 
     &:hover {
         background-color: var(--white-color);

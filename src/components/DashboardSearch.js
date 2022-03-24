@@ -6,11 +6,18 @@ import {
     AddPostButton,
     SearchIcon
 } from './styled/DashboardSearch.styled';
-import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
 
 function DashboardSearch() {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const handleClick = () => {
+        dispatch(toggleContent('new-post'));
+    }
+
     return (
         <SearchBarContainer>
             <SearchBox>
@@ -20,7 +27,7 @@ function DashboardSearch() {
                 </SearchIcon>
             </SearchBox>
             <div className="add-post-btn">
-                <AddPostButton onClick={() => { dispatch(toggleContent('newPost')) }}>New Post</AddPostButton>
+                <AddPostButton onClick={handleClick}>New Post</AddPostButton>
             </div>
         </SearchBarContainer>
     );

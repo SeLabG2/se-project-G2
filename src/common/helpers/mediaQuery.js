@@ -2,7 +2,7 @@
 const mediaScreenSize = {
     desktopMin: "45em",
     mobileMax: "45em",
-    mobileSmallMax: "22em"
+    mobileSmallMax: "20em"
 }
 
 const media = {

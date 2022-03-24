@@ -11,27 +11,30 @@ import { selectUser } from '../../../features/user/userSlice';
 import ResourcesTab from './ResourcesTab';
 import StatisticsTab from './StatisticsTab';
 import ManageClassTab from './ManageClassTab';
+import { Route, Routes } from 'react-router-dom';
+import Missing from '../../Missing/Missing';
 
 function MainContent() {
     const user = useSelector(selectUser);
     const mainContent = useSelector(selectMainContent);
 
-    useEffect(() => {
-        console.log(mainContent);
-    }, [mainContent]);
-
     return (
         <MainContentWrapper>
-            {mainContent === 'postDetails' && <PostDetails />}
-            {mainContent === 'newPost' && <NewPostForm />}
-            {user.role === 'instructor' && mainContent === 'newClass' && <CreateClass />}
-            {mainContent === 'joinClass' && <JoinClass />}
-            {mainContent === 'navTabs' && <NavTabs />}
+            {mainContent === 'new-post' && <NewPostForm />}
+            {user.role === 'instructor' && mainContent === 'create-class' && <CreateClass />}
+            {mainContent === 'join-class' && <JoinClass />}
 
-            {/* Below stuff is temporary, only to check if my implementation works */}
-            {mainContent === 'navTabs/resourcesTab' && <ResourcesTab />}
-            {mainContent === 'navTabs/statisticsTab' && <StatisticsTab />}
-            {user.role === 'instructor' && mainContent === 'navTabs/manageClassTab' && <ManageClassTab />}
+            <Routes>
+                {/* <Route path="/class/:c_id/*">
+                </Route> */}
+                <Route path="resources" element={<ResourcesTab />} />
+                <Route path="statistics" element={<StatisticsTab />} />
+                {
+                    user.role === 'instructor'
+                    &&
+                    <Route path="manage-class" element={<ManageClassTab />} />
+                }
+            </Routes>
         </MainContentWrapper>
     );
 }

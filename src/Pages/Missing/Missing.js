@@ -1,8 +1,11 @@
 import React from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 function Missing() {
     return (
-        <div>404 Page Not Found! Missing...</div>
+        <>
+            <p>Invalid address : 404</p>
+        </>
     );
 }
 
