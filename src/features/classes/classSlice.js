@@ -2,12 +2,12 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getDoc, getDocRefById } from '../../firebase/firebase-firestore';
 
 // get user from local storage
-const currentJoinedClasses = JSON.parse(localStorage.getItem('currentJoinedClasses'));
+const currentClass = JSON.parse(localStorage.getItem('currentClass'));
 
 const initialState = {
-    currentClass: null,
-    joinedClasses: currentJoinedClasses ? currentJoinedClasses : null,
-    createdClasses: null,
+    currentClass: currentClass ? currentClass : null,
+    joinedClasses: [],
+    createdClasses: [],
     isLoading: false,
     isError: false,
     isSuccess: false,
@@ -16,7 +16,7 @@ const initialState = {
 
 export const getJoinedClasses = createAsyncThunk('class/getJoinedClasses', async (user, thunkAPI) => {
     if (user.class_joined.length === 0) {
-        return null;
+        return [];
     } else {
         try {
             // get all info for joined classes of a given user from database
@@ -30,7 +30,7 @@ export const getJoinedClasses = createAsyncThunk('class/getJoinedClasses', async
                 };
             });
             const joined_classes = await Promise.all(promises);
-            localStorage.setItem('currentJoinedClasses', JSON.stringify(joined_classes));
+
             return joined_classes;
         }
         catch (error) {
@@ -52,6 +52,10 @@ export const classSlice = createSlice({
             state.isSuccess = false;
             state.message = '';
         },
+        updateCurrentClass: (state, action) => {
+            state.currentClass = action.payload;
+            localStorage.setItem('currentClass', JSON.stringify(state.currentClass));
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -63,19 +67,31 @@ export const classSlice = createSlice({
                 state.isLoading = false;
                 state.isSuccess = true;
                 state.joinedClasses = action.payload;
+                if (state.joinedClasses.length !== 0) {
+                    if (state.currentClass === null || state.currentClass == undefined) {
+                        state.currentClass = state.joinedClasses[0];
+                        localStorage.setItem('currentClass', JSON.stringify(state.currentClass));
+                    } else {
+                        // check if the current class exists in joined class list
+                        const currCls = state.joinedClasses.filter(cls => cls.c_id === currentClass.c_id);
+                        if (currCls.length === 0) {
+                            state.currentClass = state.joinedClasses[0];
+                            localStorage.setItem('currentClass', JSON.stringify(state.currentClass));
+                        }
+                    }
+                }
             })
             .addCase(getJoinedClasses.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
                 state.message = action.payload;
-                state.joinedClasses = null;
+                state.joinedClasses = [];
             })
-
     }
 });
 
 // export synchronous actions
-export const { reset } = classSlice.actions;
+export const { reset, updateCurrentClass } = classSlice.actions;
 
 // selectors
 export const selectCurrentClass = (state) => state.classes.currentClass;

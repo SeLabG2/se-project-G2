@@ -1,60 +1,76 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ContentArea from './ContentArea';
 import Navbar from '../../components/Navbar';
 import Sidebar from './Sidebar';
 import { DashboardMainWrapper, PostAndContentWrapper } from '../../components/styled/Dashboard.styled';
 import { useDispatch, useSelector } from 'react-redux';
-import { getJoinedClasses, selectJoinedClasses } from '../../features/classes/classSlice';
-import { toast } from 'react-toastify';
+import { getJoinedClasses, selectClassesStatus, selectCurrentClass, updateCurrentClass } from '../../features/classes/classSlice';
 import { selectUser } from '../../features/user/userSlice';
-import { getDoc } from 'firebase/firestore';
-import { getDocRefById } from '../../firebase/firebase-firestore';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import { getAllPosts, selectAllPosts, selectPostStatus } from '../../features/posts/postSlice';
+import { toggleContent } from '../../features/mainContentToggle/mainContentToggleSlice';
 
 function Dashboard() {
-    // const currentClass = useSelector(selectCurrentClass);
     const user = useSelector(selectUser);
+    const navigate = useNavigate();
     const dispatch = useDispatch();
-    const joinedClasses = useSelector(selectJoinedClasses);
+    const currentClass = useSelector(selectCurrentClass);
+    const { isLoading: isJoinedClassesLoading } = useSelector(selectClassesStatus);
+    const { isLoading: arePostsLoading } = useSelector(selectPostStatus);
+
+    const allPosts = useSelector(selectAllPosts);
 
     useEffect(() => {
-
         if (user.class_joined.length === 0) {
-            // if user has no joined classes then
-            // show no posts yet message or no classes joined message
+            console.log('you have no joined classes yet!');
         } else {
-            // if user has some joined class, then check if you have them in local storage
-            if (joinedClasses === null) {
-                // if you don't have them in local storage, just make API call to database
-                // this will save some billing in case you have bigger apps (i.e. making API calls only when you need)
-                dispatch(getJoinedClasses(user));
-            }
-
-            // after grabbing the current class, get all posts and current post and current discussion
-
+            console.log('congrats you have some joined classes!');
+            dispatch(getJoinedClasses(user));
         }
     }, []);
 
     useEffect(() => {
-        try {
-            if (joinedClasses === null) {
-                console.log('waiting for data...');
-            } else {
-                console.log('current class info : ', joinedClasses[0]);
+        console.log('current class changed : ', currentClass);
+        dispatch(getAllPosts(currentClass?.c_id));
+    }, [currentClass]);
+
+    useEffect(() => {
+        dispatch(toggleContent('other'));
+    }, [navigate])
+
+
+    useEffect(() => {
+        if (currentClass != undefined && currentClass !== null) {
+            if (!isJoinedClassesLoading && !arePostsLoading) {
+                console.log('all posts are : ', allPosts);
+                navigate(currentClass?.c_id);
             }
-        } catch (error) {
-            console.log(error.message);
         }
-    }, [joinedClasses]);
+    }, [arePostsLoading]);
 
 
     return (
-        <DashboardMainWrapper>
-            <Navbar />
-            <PostAndContentWrapper>
-                <Sidebar />
-                <ContentArea />
-            </PostAndContentWrapper>
-        </DashboardMainWrapper>
+        <>
+            <DashboardMainWrapper>
+                <Routes>
+                    <Route path="/:c_id/*" element={<Navbar />} />
+                    <Route path="*" element={<Navbar />} />
+                </Routes>
+                <PostAndContentWrapper>
+                    <Routes>
+                        <Route path="/:c_id/*" element={<Sidebar />} />
+                        <Route path="*" element={<Sidebar />} />
+                    </Routes>
+                    <Routes>
+                        <Route path="/:c_id/*" element={<ContentArea />} />
+                        <Route path="*" element={<ContentArea />} />
+                    </Routes>
+                </PostAndContentWrapper>
+            </DashboardMainWrapper>
+            {/* <Routes>
+                <Route path="*" element={<Missing />} />
+            </Routes> */}
+        </>
     );
 }
 

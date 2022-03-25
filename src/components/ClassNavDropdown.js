@@ -2,27 +2,26 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { reset } from '../features/classDropdownToggle/classDropdownToggleSlice';
+import { resetDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
+import { selectCurrentClass } from '../features/classes/classSlice';
 import { selectUser } from '../features/user/userSlice';
 
 function ClassNavDropdown({ className }) {
     const user = useSelector(selectUser);
+    const currentClass = useSelector(selectCurrentClass);
     const dispatch = useDispatch();
 
     const handleClick = () => {
-        dispatch(reset());
+        dispatch(resetDropdown());
     };
-
-    const testClasses = [
-        { c_id: 1, c_name: 'CS 321' },
-    ];
 
     return (
         <ClassNavDropdownContainer>
-            {/* user.class_joined.length !== 0 */}
             {
-                testClasses.length !== 0
-                    ? <Link onClick={handleClick} to={`class/${testClasses[0].c_id}`}>you joined some classes!</Link>
+                user.class_joined.length !== 0
+                    ? user.class_joined.map((class_id) => (
+                        <Link onClick={handleClick} key={class_id} to={`/dashboard/${class_id}`}>{class_id}</Link>
+                    ))
                     : <Link onClick={handleClick} to="#">you have no classes yet.</Link>
             }
         </ClassNavDropdownContainer>
@@ -30,6 +29,9 @@ function ClassNavDropdown({ className }) {
 }
 
 const ClassNavDropdownContainer = styled.div`
+    height: 200px;
+    width: 200px;
+    overflow-y: auto;
 `
 
 export default ClassNavDropdown;

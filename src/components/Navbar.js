@@ -1,22 +1,34 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { logout, reset, selectUser, selectUserStatus } from '../features/user/userSlice';
 import ClassNavDropdown from './ClassNavDropdown';
 import { selectShowDropdown, toggleDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
 import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
+import { selectJoinedClasses } from '../features/classes/classSlice';
 
 
 function Navbar() {
     const user = useSelector(selectUser);
+    const joinedClasses = useSelector(selectJoinedClasses);
     const { isError, isSuccess, message } = useSelector(selectUserStatus);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
-    const path = location.pathname;
+    const { c_id } = useParams();
     const showClassDropdown = useSelector(selectShowDropdown);
+    const [classId, setClassId] = useState();
+
+    // useEffect(() => {
+    //     if (c_id == undefined) {
+    //         setClassId('');
+    //     } else {
+    //         setClassId(c_id);
+    //     }
+    // }, [])
+
 
     useEffect(() => {
         if (isError) {
@@ -38,23 +50,14 @@ function Navbar() {
         dispatch(reset());
     }, [user, isError, isSuccess, message, navigate, dispatch]);
 
-    // useEffect(() => {
-    //     console.log(location);
-    // }, [location])
-
 
     const handleLogout = async () => {
-        localStorage.removeItem('currentJoinedClasses');
+        localStorage.removeItem('currentClass');
         dispatch(logout());
     }
 
     const resetMainContent = () => {
         dispatch(toggleContent(null));
-    }
-
-    const testClass = {
-        c_id: 1,
-        c_name: 'test'
     }
 
     return (
@@ -70,30 +73,38 @@ function Navbar() {
             <NavList>
                 <NavItem onClick={() => { dispatch(toggleDropdown()) }}>My Classes</NavItem>
                 {showClassDropdown && <ClassNavDropdown />}
-                <NavItem>
-                    <NavigationLink
-                        onClick={() => { dispatch(toggleContent(null)) }} to={`class/${testClass.c_id}/resources`}
-                    >
-                        Resources
-                    </NavigationLink>
-                </NavItem>
-                <NavItem>
-                    <NavigationLink
-                        onClick={() => { dispatch(toggleContent(null)) }} to={`class/${testClass.c_id}/statistics`}
-                    >
-                        Statistics
-                    </NavigationLink>
-                </NavItem>
                 {
-                    user.role === "instructor"
+                    joinedClasses.length !== 0
                     &&
-                    <NavItem>
-                        <NavigationLink
-                            onClick={() => { dispatch(toggleContent(null)) }} to={`class/${testClass.c_id}/manage-class`}
-                        >
-                            Manage Class
-                        </NavigationLink>
-                    </NavItem>
+                    (
+                        <>
+                            <NavItem>
+                                <NavigationLink
+                                    onClick={() => { dispatch(toggleContent('other')) }} to={`resources`}
+                                >
+                                    Resources
+                                </NavigationLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavigationLink
+                                    onClick={() => { dispatch(toggleContent('other')) }} to={`statistics`}
+                                >
+                                    Statistics
+                                </NavigationLink>
+                            </NavItem>
+                            {
+                                user.role === "instructor"
+                                &&
+                                <NavItem>
+                                    <NavigationLink
+                                        onClick={() => { dispatch(toggleContent('other')) }} to={`manage-class`}
+                                    >
+                                        Manage Class
+                                    </NavigationLink>
+                                </NavItem>
+                            }
+                        </>
+                    )
                 }
             </NavList>
             <button onClick={handleLogout}>Logout</button>

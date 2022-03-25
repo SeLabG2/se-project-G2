@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PostDetails from '../../../components/PostDetails';
 import NewPostForm from './NewPostForm';
 import CreateClass from './CreateClass';
 import JoinClass from './JoinClass';
-import NavTabs from '../../../components/NavTabs';
 import { MainContentWrapper } from '../../../components/styled/MainContent.styled';
 import { useSelector } from 'react-redux';
 import { selectMainContent } from '../../../features/mainContentToggle/mainContentToggleSlice';
@@ -11,8 +10,7 @@ import { selectUser } from '../../../features/user/userSlice';
 import ResourcesTab from './ResourcesTab';
 import StatisticsTab from './StatisticsTab';
 import ManageClassTab from './ManageClassTab';
-import { Route, Routes } from 'react-router-dom';
-import Missing from '../../Missing/Missing';
+import { Route, Routes, useParams } from 'react-router-dom';
 
 function MainContent() {
     const user = useSelector(selectUser);
@@ -24,17 +22,24 @@ function MainContent() {
             {user.role === 'instructor' && mainContent === 'create-class' && <CreateClass />}
             {mainContent === 'join-class' && <JoinClass />}
 
-            <Routes>
-                {/* <Route path="/class/:c_id/*">
-                </Route> */}
-                <Route path="resources" element={<ResourcesTab />} />
-                <Route path="statistics" element={<StatisticsTab />} />
-                {
-                    user.role === 'instructor'
-                    &&
-                    <Route path="manage-class" element={<ManageClassTab />} />
-                }
-            </Routes>
+            {
+                mainContent === 'other'
+                &&
+                <>
+                    <Routes>
+                        <Route path=":p_id" element={<PostDetails />} />
+                        <Route path={`resources`} element={<ResourcesTab />} />
+                        <Route path={`statistics`} element={<StatisticsTab />} />
+                        {
+                            user.role === 'instructor'
+                            &&
+                            <Route path={`manage-class`} element={<ManageClassTab />} />
+                        }
+                    </Routes>
+                </>
+            }
+
+
         </MainContentWrapper>
     );
 }

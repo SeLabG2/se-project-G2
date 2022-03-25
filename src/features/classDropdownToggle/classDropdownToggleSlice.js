@@ -11,14 +11,14 @@ export const classDropdownToggleSlice = createSlice({
         toggleDropdown: (state) => {
             state.show = !state.show;
         },
-        reset: (state) => {
+        resetDropdown: (state) => {
             state.show = false;
         }
     },
 });
 
 // actions
-export const { toggleDropdown, reset } = classDropdownToggleSlice.actions;
+export const { toggleDropdown, resetDropdown } = classDropdownToggleSlice.actions;
 
 // selector
 export const selectShowDropdown = (state) => state.toggleClassDropdown.show;
