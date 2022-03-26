@@ -42,7 +42,7 @@ function Navbar() {
     }, [user, isError, isSuccess, message, navigate, dispatch]);
 
     const handleNavTabClick = () => {
-        dispatch(toggleContent('other'))
+        dispatch(toggleContent('other'));
         dispatch(resetDropdown());
     }
 

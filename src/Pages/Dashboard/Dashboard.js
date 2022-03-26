@@ -64,7 +64,7 @@ function Dashboard() {
             console.log('the current class is : ', currentClass);
             navigate(currentClass?.c_id);
         }
-    }, [isCurrentClassLoading]);
+    }, [currentClass]);
 
     useEffect(() => {
         dispatch(toggleContent('other'));

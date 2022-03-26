@@ -58,10 +58,6 @@ function CreateClass() {
         }));
     };
 
-    const validate = async () => {
-
-    }
-
     const handleSubmit = (e) => {
         e.preventDefault();
 
