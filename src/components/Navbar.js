@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { logout, reset, selectUser, selectUserStatus } from '../features/user/userSlice';
 import ClassNavDropdown from './ClassNavDropdown';
-import { selectShowDropdown, toggleDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
+import { resetDropdown, selectShowDropdown, toggleDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
 import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
 import { selectJoinedClasses } from '../features/classes/classSlice';
 
@@ -20,15 +20,6 @@ function Navbar() {
     const { c_id } = useParams();
     const showClassDropdown = useSelector(selectShowDropdown);
     const [classId, setClassId] = useState();
-
-    // useEffect(() => {
-    //     if (c_id == undefined) {
-    //         setClassId('');
-    //     } else {
-    //         setClassId(c_id);
-    //     }
-    // }, [])
-
 
     useEffect(() => {
         if (isError) {
@@ -50,6 +41,10 @@ function Navbar() {
         dispatch(reset());
     }, [user, isError, isSuccess, message, navigate, dispatch]);
 
+    const handleNavTabClick = () => {
+        dispatch(toggleContent('other'))
+        dispatch(resetDropdown());
+    }
 
     const handleLogout = async () => {
         localStorage.removeItem('currentClass');
@@ -62,17 +57,46 @@ function Navbar() {
 
     return (
         <NavbarContainer>
-            <NavigationLink className='logo' to="/">Logo</NavigationLink>
+            <NavigationLink
+                onClick={() => { dispatch(resetDropdown()); }}
+                className='logo'
+                to="/"
+            >
+                Logo
+            </NavigationLink>
+
             {
                 user.role === "instructor"
                 &&
-                <button onClick={() => { dispatch(toggleContent('create-class')) }}>New Class</button>
+                <button
+                    onClick={() => {
+                        dispatch(toggleContent('create-class'));
+                        dispatch(resetDropdown());
+                    }}
+                >
+                    New Class
+                </button>
             }
-            <button onClick={() => { dispatch(toggleContent('join-class')) }}>Join Class</button>
+            <button
+                onClick={() => {
+                    dispatch(toggleContent('join-class'));
+                    dispatch(resetDropdown());
+                }}
+            >
+                Join Class
+            </button>
 
             <NavList>
-                <NavItem onClick={() => { dispatch(toggleDropdown()) }}>My Classes</NavItem>
+                <NavItem
+                    onClick={() => {
+                        dispatch(toggleDropdown());
+                    }}
+                >
+                    My Classes
+                </NavItem>
+
                 {showClassDropdown && <ClassNavDropdown />}
+
                 {
                     joinedClasses.length !== 0
                     &&
@@ -80,14 +104,14 @@ function Navbar() {
                         <>
                             <NavItem>
                                 <NavigationLink
-                                    onClick={() => { dispatch(toggleContent('other')) }} to={`resources`}
+                                    onClick={handleNavTabClick} to={`resources`}
                                 >
                                     Resources
                                 </NavigationLink>
                             </NavItem>
                             <NavItem>
                                 <NavigationLink
-                                    onClick={() => { dispatch(toggleContent('other')) }} to={`statistics`}
+                                    onClick={handleNavTabClick} to={`statistics`}
                                 >
                                     Statistics
                                 </NavigationLink>
@@ -97,7 +121,7 @@ function Navbar() {
                                 &&
                                 <NavItem>
                                     <NavigationLink
-                                        onClick={() => { dispatch(toggleContent('other')) }} to={`manage-class`}
+                                        onClick={handleNavTabClick} to={`manage-class`}
                                     >
                                         Manage Class
                                     </NavigationLink>

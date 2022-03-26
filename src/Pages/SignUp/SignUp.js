@@ -84,8 +84,7 @@ function SignUp() {
             role,
             username,
             email,
-            password,
-            class_joined: []
+            password
         };
         dispatch(signup(userData));
     };

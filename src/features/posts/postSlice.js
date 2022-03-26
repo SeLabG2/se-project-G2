@@ -44,6 +44,9 @@ export const postSlice = createSlice({
             state.isSuccess = false;
             state.message = '';
         },
+        getPosts: (state, action) => {
+            state.allPosts = action.payload;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -66,7 +69,7 @@ export const postSlice = createSlice({
 });
 
 // export synchronous actions
-export const { reset } = postSlice.actions;
+export const { reset, getPosts } = postSlice.actions;
 
 // selectors
 export const selectCurrentPost = (state) => state.posts.currentPost;

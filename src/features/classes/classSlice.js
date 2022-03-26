@@ -55,6 +55,9 @@ export const classSlice = createSlice({
         updateCurrentClass: (state, action) => {
             state.currentClass = action.payload;
             localStorage.setItem('currentClass', JSON.stringify(state.currentClass));
+        },
+        updateJoinedClasses: (state, action) => {
+            state.joinedClasses = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -91,7 +94,7 @@ export const classSlice = createSlice({
 });
 
 // export synchronous actions
-export const { reset, updateCurrentClass } = classSlice.actions;
+export const { reset, updateCurrentClass, updateJoinedClasses } = classSlice.actions;
 
 // selectors
 export const selectCurrentClass = (state) => state.classes.currentClass;

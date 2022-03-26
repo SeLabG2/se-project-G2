@@ -9,6 +9,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
+import { resetDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
 
 function DashboardSearch() {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ function DashboardSearch() {
 
     const handleClick = () => {
         dispatch(toggleContent('new-post'));
+        dispatch(resetDropdown());
     }
 
     return (

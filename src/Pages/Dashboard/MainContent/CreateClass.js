@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '../../../features/user/userSlice';
 import { getColRef } from '../../../firebase/firebase-firestore';
-import { addDoc } from 'firebase/firestore';
+import { addDoc, serverTimestamp } from 'firebase/firestore';
 import { toggleContent } from '../../../features/mainContentToggle/mainContentToggleSlice';
 
 function CreateClass() {
@@ -11,6 +11,7 @@ function CreateClass() {
     const dispatch = useDispatch();
 
     const initialFormData = {
+        created_at: serverTimestamp(),
         uni_id: user.uni_id,
         c_name: '',
         c_num: '',

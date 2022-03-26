@@ -15,4 +15,7 @@ export const store = configureStore({
         mainContent: mainContentToggleReducer,
         toggleClassDropdown: classDropdownToggleSlice
     },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        serializableCheck: false
+    }),
 });
