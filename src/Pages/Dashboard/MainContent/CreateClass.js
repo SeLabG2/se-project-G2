@@ -27,7 +27,7 @@ function CreateClass() {
     const [formData, setFormData] = useState(initialFormData);
     const [attendanceList, setAttendanceList] = useState('');
 
-    const { c_name, c_num, c_size, c_term, access_code, joined_users } = formData;
+    const { c_name, c_num, c_size, c_term, access_code } = formData;
 
     const [isValidationComplete, setIsValidationComplete] = useState(false);
 

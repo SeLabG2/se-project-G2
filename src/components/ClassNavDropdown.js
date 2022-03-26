@@ -3,13 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { resetDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
-import { selectCurrentClass, selectJoinedClasses, updateCurrentClass } from '../features/classes/classSlice';
-import { selectUser } from '../features/user/userSlice';
+import { selectJoinedClasses, updateCurrentClass } from '../features/classes/classSlice';
 
 function ClassNavDropdown({ className }) {
-    const user = useSelector(selectUser);
     const joinedClasses = useSelector(selectJoinedClasses);
-    const currentClass = useSelector(selectCurrentClass);
     const dispatch = useDispatch();
 
     const handleClick = (cls) => {

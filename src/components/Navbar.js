@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { logout, reset, selectUser, selectUserStatus } from '../features/user/userSlice';
@@ -16,10 +16,7 @@ function Navbar() {
     const { isError, isSuccess, message } = useSelector(selectUserStatus);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const location = useLocation();
-    const { c_id } = useParams();
     const showClassDropdown = useSelector(selectShowDropdown);
-    const [classId, setClassId] = useState();
 
     useEffect(() => {
         if (isError) {
@@ -49,10 +46,6 @@ function Navbar() {
     const handleLogout = async () => {
         localStorage.removeItem('currentClass');
         dispatch(logout());
-    }
-
-    const resetMainContent = () => {
-        dispatch(toggleContent(null));
     }
 
     return (

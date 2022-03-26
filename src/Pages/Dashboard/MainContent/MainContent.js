@@ -10,7 +10,7 @@ import { selectUser } from '../../../features/user/userSlice';
 import ResourcesTab from './ResourcesTab';
 import StatisticsTab from './StatisticsTab';
 import ManageClassTab from './ManageClassTab';
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 function MainContent() {
     const user = useSelector(selectUser);

@@ -1,5 +1,4 @@
 import React from 'react';
-import { StyledPostCard } from './styled/PostList.styled';
 import Comments from './Comments';
 import { useParams } from 'react-router-dom';
 

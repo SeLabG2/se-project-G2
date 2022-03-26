@@ -54,6 +54,7 @@ export const classSlice = createSlice({
         },
         updateCurrentClass: (state, action) => {
             state.currentClass = action.payload;
+            // console.log('current class at update is : ', state.currentClass);
             localStorage.setItem('currentClass', JSON.stringify(state.currentClass));
         },
         updateJoinedClasses: (state, action) => {
@@ -76,7 +77,7 @@ export const classSlice = createSlice({
                         localStorage.setItem('currentClass', JSON.stringify(state.currentClass));
                     } else {
                         // check if the current class exists in joined class list
-                        const currCls = state.joinedClasses.filter(cls => cls.c_id === currentClass.c_id);
+                        const currCls = state.joinedClasses.filter(cls => cls.c_id === state.currentClass?.c_id);
                         if (currCls.length === 0) {
                             state.currentClass = state.joinedClasses[0];
                             localStorage.setItem('currentClass', JSON.stringify(state.currentClass));

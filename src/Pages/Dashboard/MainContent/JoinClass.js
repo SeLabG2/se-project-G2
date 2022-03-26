@@ -54,8 +54,8 @@ function JoinClass() {
 
         const isSafeToJoin = validate();
 
-        setIsSubmitting(true);
         if (isSafeToJoin) {
+            setIsSubmitting(true);
             const joinTheClass = async () => {
                 try {
                     const classColRef = getColRef('classes');
@@ -72,14 +72,43 @@ function JoinClass() {
 
                     // now update the class
 
-                    let new_joined_users = querySnapshot.docs[0]?.data().joined_users;
-                    new_joined_users.push(user.email);
-                    const classDocRef = getDocRefById(class_id, 'classes');
-                    await updateDoc(classDocRef, {
-                        joined_users: [...new_joined_users]
-                    });
+                    if (class_id != undefined && class_id !== null) {
+                        let new_joined_users = querySnapshot.docs[0]?.data().joined_users;
+                        new_joined_users?.push(user.email);
+                        const classDocRef = getDocRefById(class_id, 'classes');
+                        await updateDoc(classDocRef, {
+                            joined_users: [...new_joined_users]
+                        });
 
-                    toast(`You've successfully joined this class... check your classes.`, {
+                        toast(`You've successfully joined this class... check your classes.`, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                        });
+                    } else {
+                        toast(`Can't join this class.. No such class exists... Or maybe try checking the access code`, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                        });
+                    }
+
+                    setIsSubmitting(false);
+
+                    dispatch(toggleContent('other'));
+                    dispatch(resetDropdown());
+
+
+                } catch (error) {
+                    toast(error.message, {
                         position: "top-center",
                         autoClose: 5000,
                         hideProgressBar: false,
@@ -88,15 +117,7 @@ function JoinClass() {
                         draggable: true,
                         progress: undefined,
                     });
-
-                    setIsSubmitting(true);
-
-                    dispatch(toggleContent('other'));
-                    dispatch(resetDropdown());
-
-
-                } catch (error) {
-                    console.log(error.message);
+                    setIsSubmitting(false);
                 }
             }
             joinTheClass();

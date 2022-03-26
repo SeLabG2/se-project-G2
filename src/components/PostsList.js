@@ -1,4 +1,4 @@
-import { getDoc, getDocs, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { onSnapshot, orderBy, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -15,19 +15,16 @@ function PostsList() {
     const navigate = useNavigate();
     const { c_id } = useParams();
     const [arePostsLoading, setArePostsLoading] = useState(true);
-    const [posts, setPosts] = useState(allPosts);
 
     useEffect(() => {
-        console.log('postlist loaded');
         const postColRef = getColRef(`classes/${currentClass?.c_id}/posts`);
         const postQuery = query(
             postColRef,
-            where('type', '==', 'poll')
+            orderBy('created_at', 'desc')
         );
 
         const unsubscribe = onSnapshot(postQuery, (snapshot) => {
             const promises = snapshot.docs.map((doc) => {
-                console.log('each post is : ', doc.data());
                 return { ...doc.data(), p_id: doc.id };
             });
             Promise.all(promises)

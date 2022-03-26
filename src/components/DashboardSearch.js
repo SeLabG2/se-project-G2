@@ -6,19 +6,28 @@ import {
     AddPostButton,
     SearchIcon
 } from './styled/DashboardSearch.styled';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
 import { resetDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
+import { selectCurrentClass, selectJoinedClasses } from '../features/classes/classSlice';
 
 function DashboardSearch() {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
+    const joinedClasses = useSelector(selectJoinedClasses);
+    const currentClass = useSelector(selectCurrentClass);
 
     const handleClick = () => {
         dispatch(toggleContent('new-post'));
         dispatch(resetDropdown());
     }
+
+    const noCurrentClassAvailable = (
+        joinedClasses.length === 0
+        ||
+        currentClass == undefined
+        ||
+        currentClass === null
+    )
 
     return (
         <SearchBarContainer>
@@ -29,7 +38,7 @@ function DashboardSearch() {
                 </SearchIcon>
             </SearchBox>
             <div className="add-post-btn">
-                <AddPostButton onClick={handleClick}>New Post</AddPostButton>
+                <AddPostButton disabled={noCurrentClassAvailable} onClick={handleClick}>New Post</AddPostButton>
             </div>
         </SearchBarContainer>
     );

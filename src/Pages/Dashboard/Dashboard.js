@@ -4,10 +4,9 @@ import Navbar from '../../components/Navbar';
 import Sidebar from './Sidebar';
 import { DashboardMainWrapper, PostAndContentWrapper } from '../../components/styled/Dashboard.styled';
 import { useDispatch, useSelector } from 'react-redux';
-import { getJoinedClasses, selectClassesStatus, selectCurrentClass, selectJoinedClasses, updateCurrentClass, updateJoinedClasses } from '../../features/classes/classSlice';
+import { selectCurrentClass, selectJoinedClasses, updateCurrentClass, updateJoinedClasses } from '../../features/classes/classSlice';
 import { selectUser } from '../../features/user/userSlice';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { getAllPosts, getPosts, selectAllPosts, selectPostStatus } from '../../features/posts/postSlice';
 import { toggleContent } from '../../features/mainContentToggle/mainContentToggleSlice';
 import { onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { getColRef } from '../../firebase/firebase-firestore';
@@ -19,9 +18,9 @@ function Dashboard() {
     const [isCurrentClassLoading, setIsCurrentClassLoading] = useState(true);
     const joinedClasses = useSelector(selectJoinedClasses);
     const currentClass = useSelector(selectCurrentClass);
-    const allPosts = useSelector(selectAllPosts);
 
     useEffect(() => {
+        console.log('current class at local storage at component mount is : ', JSON.parse(localStorage.getItem('currentClass')));
         const classColRef = getColRef('classes');
         const joinedClassQuery = query(
             classColRef,
@@ -36,9 +35,9 @@ function Dashboard() {
             Promise.all(promises)
                 .then((joined_classes) => {
                     dispatch(updateJoinedClasses(joined_classes));
-
+                    const localCurrentClass = JSON.parse(localStorage.getItem('currentClass'));
                     if (joined_classes.length !== 0) {
-                        if (currentClass === null || currentClass == undefined) {
+                        if (localCurrentClass === null || localCurrentClass == undefined) {
                             dispatch(updateCurrentClass(joined_classes[0]));
                         } else {
                             // check if the current class exists in joined class list
@@ -62,9 +61,11 @@ function Dashboard() {
 
             console.log('the joinedClasses are : ', joinedClasses);
             console.log('the current class is : ', currentClass);
-            navigate(currentClass?.c_id);
+            if (currentClass != undefined && currentClass !== null) {
+                navigate(currentClass?.c_id);
+            }
         }
-    }, [currentClass]);
+    }, [isCurrentClassLoading]);
 
     useEffect(() => {
         dispatch(toggleContent('other'));
