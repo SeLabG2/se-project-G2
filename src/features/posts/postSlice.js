@@ -27,6 +27,7 @@ export const getAllPosts = createAsyncThunk('posts/getAllPosts', async (class_id
 const initialState = {
     currentPost: null,
     allPosts: [],
+    currentDiscussion: '',
     isLoading: false,
     isError: false,
     isSuccess: false,
@@ -40,6 +41,7 @@ export const postSlice = createSlice({
         resetPosts: (state) => {
             state.currentPost = null;
             state.allPosts = [];
+            state.currentDiscussion = '';
             state.isLoading = false;
             state.isError = false;
             state.isSuccess = false;
@@ -53,6 +55,9 @@ export const postSlice = createSlice({
         },
         getPosts: (state, action) => {
             state.allPosts = action.payload;
+        },
+        updateCurrentDiscussion: (state, action) => {
+            state.currentDiscussion = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -76,10 +81,11 @@ export const postSlice = createSlice({
 });
 
 // export synchronous actions
-export const { resetPosts, reset, getPosts } = postSlice.actions;
+export const { resetPosts, reset, getPosts, updateCurrentDiscussion } = postSlice.actions;
 
 // selectors
 export const selectCurrentPost = (state) => state.posts.currentPost;
+export const selectCurrentDiscussion = (state) => state.posts.currentDiscussion;
 export const selectAllPosts = (state) => state.posts.allPosts;
 export const selectPostStatus = (state) => ({
     isLoading: state.posts.isLoading,

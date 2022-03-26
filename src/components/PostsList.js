@@ -4,17 +4,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { selectCurrentClass } from '../features/classes/classSlice';
 import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
-import { getPosts, selectAllPosts } from '../features/posts/postSlice';
+import { getPosts, selectAllPosts, selectCurrentDiscussion } from '../features/posts/postSlice';
 import { getColRef } from '../firebase/firebase-firestore';
 import { PostListContainer, StyledPostCard } from './styled/PostList.styled';
+import { resetDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
 
 function PostsList() {
     const dispatch = useDispatch();
     const allPosts = useSelector(selectAllPosts);
+    const currentDiscussion = useSelector(selectCurrentDiscussion);
     const currentClass = useSelector(selectCurrentClass);
     const navigate = useNavigate();
     const { c_id } = useParams();
     const [arePostsLoading, setArePostsLoading] = useState(true);
+    const [filteredPosts, setFilteredPosts] = useState([]);
 
     useEffect(() => {
         const postColRef = getColRef(`classes/${currentClass?.c_id}/posts`);
@@ -31,6 +34,15 @@ function PostsList() {
                 .then((posts) => {
                     dispatch(getPosts(posts));
                     console.log('all the posts are : ', posts);
+                    if (posts.length !== 0) {
+                        if (currentDiscussion === '') {
+                            setFilteredPosts([...posts]);
+                        } else {
+                            setFilteredPosts(posts.filter(post => {
+                                post?.discussion_list.includes(currentDiscussion);
+                            }));
+                        }
+                    }
                     setArePostsLoading(false);
                 })
                 .catch((err) => {
@@ -41,20 +53,30 @@ function PostsList() {
         return unsubscribe;
     }, [c_id])
 
-    // useEffect(() => {
-    //     console.log('all posts : ', allPosts);
-    // }, [currentClass]);
+    useEffect(() => {
+        console.log('all posts : ', allPosts);
+        if (currentDiscussion === '') {
+            setFilteredPosts([...allPosts]);
+        } else {
+            setFilteredPosts(allPosts.filter(post => {
+                post?.discussion_list.includes(currentDiscussion);
+            }));
+        }
+    }, [currentDiscussion]);
+
+
 
 
     return (
         <PostListContainer>
             {
-                allPosts.length !== 0
+                filteredPosts.length !== 0
                     ?
-                    allPosts.map((post) => (
+                    filteredPosts.map((post) => (
                         <StyledPostCard
                             key={post.p_id}
                             onClick={() => {
+                                dispatch(resetDropdown());
                                 dispatch(toggleContent('other'));
                                 navigate(`/dashboard/${c_id}/${post.p_id}`)
                             }}

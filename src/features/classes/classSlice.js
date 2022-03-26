@@ -33,7 +33,7 @@ export const getJoinedClasses = createAsyncThunk('class/getJoinedClasses', async
 });
 
 const initialState = {
-    currentClass: null,
+    currentClass: localCurrentClass ? localCurrentClass : null,
     joinedClasses: [],
     createdClasses: [],
     isLoading: false,
