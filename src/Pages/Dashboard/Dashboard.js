@@ -20,7 +20,6 @@ function Dashboard() {
     const currentClass = useSelector(selectCurrentClass);
 
     useEffect(() => {
-        console.log('current class at local storage at component mount is : ', JSON.parse(localStorage.getItem('currentClass')));
         const classColRef = getColRef('classes');
         const joinedClassQuery = query(
             classColRef,
@@ -35,13 +34,13 @@ function Dashboard() {
             Promise.all(promises)
                 .then((joined_classes) => {
                     dispatch(updateJoinedClasses(joined_classes));
-                    const localCurrentClass = JSON.parse(localStorage.getItem('currentClass'));
                     if (joined_classes.length !== 0) {
+                        const localCurrentClass = JSON.parse(localStorage.getItem('currentClass'));
                         if (localCurrentClass === null || localCurrentClass == undefined) {
                             dispatch(updateCurrentClass(joined_classes[0]));
                         } else {
                             // check if the current class exists in joined class list
-                            const currCls = joined_classes.filter(cls => cls.c_id === currentClass.c_id);
+                            const currCls = joined_classes.filter(cls => cls.c_id === currentClass?.c_id);
                             if (currCls.length === 0) {
                                 dispatch(updateCurrentClass(joined_classes[0]));
                             }
@@ -73,25 +72,31 @@ function Dashboard() {
 
     return (
         <>
-            <DashboardMainWrapper>
-                <Routes>
-                    <Route path="/:c_id/*" element={<Navbar />} />
-                    <Route path="*" element={<Navbar />} />
-                </Routes>
-                <PostAndContentWrapper>
-                    <Routes>
-                        <Route path="/:c_id/*" element={<Sidebar />} />
-                        <Route path="*" element={<Sidebar />} />
-                    </Routes>
-                    <Routes>
-                        <Route path="/:c_id/*" element={<ContentArea />} />
-                        <Route path="*" element={<ContentArea />} />
-                    </Routes>
-                </PostAndContentWrapper>
-            </DashboardMainWrapper>
-            {/* <Routes>
+            {
+                (!isCurrentClassLoading)
+                &&
+                <>
+                    <DashboardMainWrapper>
+                        <Routes>
+                            <Route path="/:c_id/*" element={<Navbar />} />
+                            <Route path="*" element={<Navbar />} />
+                        </Routes>
+                        <PostAndContentWrapper>
+                            <Routes>
+                                <Route path="/:c_id/*" element={<Sidebar />} />
+                                <Route path="*" element={<Sidebar />} />
+                            </Routes>
+                            <Routes>
+                                <Route path="/:c_id/*" element={<ContentArea />} />
+                                <Route path="*" element={<ContentArea />} />
+                            </Routes>
+                        </PostAndContentWrapper>
+                    </DashboardMainWrapper>
+                    {/* <Routes>
                 <Route path="*" element={<Missing />} />
             </Routes> */}
+                </>
+            }
         </>
     );
 }

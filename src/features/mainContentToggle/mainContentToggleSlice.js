@@ -11,14 +11,14 @@ export const mainContentToggleSlice = createSlice({
         toggleContent: (state, action) => {
             state.value = action.payload;
         },
-        resetContent: (state) => {
-            state = initialState;
+        resetMainContent: (state) => {
+            state.value = 'other';
         }
     },
 });
 
 // actions
-export const { toggleContent, resetContent } = mainContentToggleSlice.actions;
+export const { toggleContent, resetMainContent } = mainContentToggleSlice.actions;
 
 // selector
 export const selectMainContent = (state) => state.mainContent.value;

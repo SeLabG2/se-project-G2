@@ -8,7 +8,6 @@ import { addDoc, serverTimestamp } from 'firebase/firestore';
 import { getColRef } from '../../../firebase/firebase-firestore';
 import { toggleContent } from '../../../features/mainContentToggle/mainContentToggleSlice';
 import { resetDropdown } from '../../../features/classDropdownToggle/classDropdownToggleSlice'
-import { useNavigate } from 'react-router-dom';
 
 function NewPostForm() {
     const dispatch = useDispatch();

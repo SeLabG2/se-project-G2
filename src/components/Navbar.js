@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -6,17 +6,20 @@ import styled from 'styled-components';
 import { logout, reset, selectUser, selectUserStatus } from '../features/user/userSlice';
 import ClassNavDropdown from './ClassNavDropdown';
 import { resetDropdown, selectShowDropdown, toggleDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
-import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
-import { selectJoinedClasses } from '../features/classes/classSlice';
+import { resetMainContent, toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
+import { resetClasses, selectCurrentClass, selectJoinedClasses } from '../features/classes/classSlice';
+import { resetPosts } from '../features/posts/postSlice';
 
 
 function Navbar() {
     const user = useSelector(selectUser);
     const joinedClasses = useSelector(selectJoinedClasses);
+    const currentClass = useSelector(selectCurrentClass);
     const { isError, isSuccess, message } = useSelector(selectUserStatus);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const showClassDropdown = useSelector(selectShowDropdown);
+    const [storeResetDone, setStoreResetDone] = useState(false);
 
     useEffect(() => {
         if (isError) {
@@ -31,12 +34,12 @@ function Navbar() {
             });
         }
 
-        if (isSuccess || !user) {
+        if (storeResetDone && (isSuccess || !user)) {
             navigate('/');
         }
 
         dispatch(reset());
-    }, [user, isError, isSuccess, message, navigate, dispatch]);
+    }, [user, isError, isSuccess, message, storeResetDone, navigate, dispatch]);
 
     const handleNavTabClick = () => {
         dispatch(toggleContent('other'));
@@ -45,6 +48,11 @@ function Navbar() {
 
     const handleLogout = async () => {
         localStorage.removeItem('currentClass');
+        dispatch(resetPosts());
+        dispatch(resetDropdown());
+        dispatch(resetMainContent());
+        dispatch(resetClasses());
+        setStoreResetDone(true);
         dispatch(logout());
     }
 
@@ -92,6 +100,10 @@ function Navbar() {
 
                 {
                     joinedClasses.length !== 0
+                    &&
+                    currentClass != undefined
+                    &&
+                    currentClass !== null
                     &&
                     (
                         <>

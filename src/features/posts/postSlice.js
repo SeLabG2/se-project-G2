@@ -2,16 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getDocs } from 'firebase/firestore';
 import { getColRef } from '../../firebase/firebase-firestore';
 
-
-const initialState = {
-    currentPost: null,
-    allPosts: [],
-    isLoading: false,
-    isError: false,
-    isSuccess: false,
-    message: ''
-};
-
 export const getAllPosts = createAsyncThunk('posts/getAllPosts', async (class_id, thunkAPI) => {
     try {
         // get all info for joined classes of a given user from database
@@ -34,10 +24,27 @@ export const getAllPosts = createAsyncThunk('posts/getAllPosts', async (class_id
     }
 });
 
+const initialState = {
+    currentPost: null,
+    allPosts: [],
+    isLoading: false,
+    isError: false,
+    isSuccess: false,
+    message: ''
+};
+
 export const postSlice = createSlice({
     name: 'posts',
     initialState,
     reducers: {
+        resetPosts: (state) => {
+            state.currentPost = null;
+            state.allPosts = [];
+            state.isLoading = false;
+            state.isError = false;
+            state.isSuccess = false;
+            state.message = '';
+        },
         reset: (state) => {
             state.isLoading = false;
             state.isError = false;
@@ -69,7 +76,7 @@ export const postSlice = createSlice({
 });
 
 // export synchronous actions
-export const { reset, getPosts } = postSlice.actions;
+export const { resetPosts, reset, getPosts } = postSlice.actions;
 
 // selectors
 export const selectCurrentPost = (state) => state.posts.currentPost;

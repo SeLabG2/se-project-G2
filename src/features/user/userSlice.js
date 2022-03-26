@@ -7,14 +7,6 @@ import { setDoc, getDoc, getDocRefById } from '../../firebase/firebase-firestore
 // get user from local storage
 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-const initialState = {
-    user: currentUser ? currentUser : null,
-    isLoading: false,
-    isError: false,
-    isSuccess: false,
-    message: ''
-};
-
 export const signup = createAsyncThunk('user/signup', async (user, thunkAPI) => {
     try {
         const { password, ...userDataWithoutPassword } = user;
@@ -72,6 +64,14 @@ export const logout = createAsyncThunk('user/logout', async (thunkAPI) => {
         return thunkAPI.rejectWithValue(message);
     }
 });
+
+const initialState = {
+    user: currentUser ? currentUser : null,
+    isLoading: false,
+    isError: false,
+    isSuccess: false,
+    message: ''
+};
 
 export const userSlice = createSlice({
     name: 'user',

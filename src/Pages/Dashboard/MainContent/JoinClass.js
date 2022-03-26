@@ -1,5 +1,5 @@
 import { getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getColRef, getDocRefById } from '../../../firebase/firebase-firestore';
@@ -7,6 +7,7 @@ import { selectJoinedClasses } from '../../../features/classes/classSlice';
 import { selectUser } from '../../../features/user/userSlice';
 import { toggleContent } from '../../../features/mainContentToggle/mainContentToggleSlice';
 import { resetDropdown } from '../../../features/classDropdownToggle/classDropdownToggleSlice';
+import { useNavigate } from 'react-router-dom';
 
 function JoinClass() {
     const [formData, setFormData] = useState({
@@ -20,6 +21,17 @@ function JoinClass() {
     const joinedClasses = useSelector(selectJoinedClasses);
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [readyToNavigate, setReadyToNavigate] = useState(false);
+
+
+    useEffect(() => {
+        if (readyToNavigate) {
+            if (joinedClasses.length === 1) {
+                navigate(joinedClasses[0].c_id);
+            }
+        }
+    }, [readyToNavigate]);
 
     const onChange = (e) => {
         setFormData((prevState) => ({
@@ -89,6 +101,8 @@ function JoinClass() {
                             draggable: true,
                             progress: undefined,
                         });
+
+                        setReadyToNavigate(true);
                     } else {
                         toast(`Can't join this class.. No such class exists... Or maybe try checking the access code`, {
                             position: "top-center",
@@ -134,6 +148,8 @@ function JoinClass() {
             });
         }
     }
+
+
     return (
         <>
             <div>JoinClass</div>

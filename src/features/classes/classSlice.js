@@ -2,17 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getDoc, getDocRefById } from '../../firebase/firebase-firestore';
 
 // get user from local storage
-const currentClass = JSON.parse(localStorage.getItem('currentClass'));
-
-const initialState = {
-    currentClass: currentClass ? currentClass : null,
-    joinedClasses: [],
-    createdClasses: [],
-    isLoading: false,
-    isError: false,
-    isSuccess: false,
-    message: ''
-};
+const localCurrentClass = JSON.parse(localStorage.getItem('currentClass'));
 
 export const getJoinedClasses = createAsyncThunk('class/getJoinedClasses', async (user, thunkAPI) => {
     if (user.class_joined.length === 0) {
@@ -42,10 +32,29 @@ export const getJoinedClasses = createAsyncThunk('class/getJoinedClasses', async
     }
 });
 
+const initialState = {
+    currentClass: null,
+    joinedClasses: [],
+    createdClasses: [],
+    isLoading: false,
+    isError: false,
+    isSuccess: false,
+    message: ''
+};
+
 export const classSlice = createSlice({
     name: 'classes',
     initialState,
     reducers: {
+        resetClasses: (state) => {
+            state.currentClass = null;
+            state.joinedClasses = [];
+            state.createdClasses = [];
+            state.isLoading = false;
+            state.isError = false;
+            state.isSuccess = false;
+            state.message = '';
+        },
         reset: (state) => {
             state.isLoading = false;
             state.isError = false;
@@ -54,7 +63,6 @@ export const classSlice = createSlice({
         },
         updateCurrentClass: (state, action) => {
             state.currentClass = action.payload;
-            // console.log('current class at update is : ', state.currentClass);
             localStorage.setItem('currentClass', JSON.stringify(state.currentClass));
         },
         updateJoinedClasses: (state, action) => {
@@ -95,7 +103,7 @@ export const classSlice = createSlice({
 });
 
 // export synchronous actions
-export const { reset, updateCurrentClass, updateJoinedClasses } = classSlice.actions;
+export const { resetClasses, reset, updateCurrentClass, updateJoinedClasses } = classSlice.actions;
 
 // selectors
 export const selectCurrentClass = (state) => state.classes.currentClass;

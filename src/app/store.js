@@ -1,21 +1,33 @@
 //src/app/store.js
 
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import userReducer from '../features/user/userSlice';
 import mainContentToggleReducer from '../features/mainContentToggle/mainContentToggleSlice';
 import classDropdownToggleSlice from '../features/classDropdownToggle/classDropdownToggleSlice';
 import classesReducer from '../features/classes/classSlice';
 import postReducer from '../features/posts/postSlice';
 
+const combinedReducer = combineReducers({
+    user: userReducer,
+    classes: classesReducer,
+    posts: postReducer,
+    mainContent: mainContentToggleReducer,
+    toggleClassDropdown: classDropdownToggleSlice
+});
+
+
+const rootReducer = (state, action) => {
+    if (action.type === 'user/logout') {
+        state = undefined;
+    }
+    return combinedReducer(state, action);
+};
+
 export const store = configureStore({
-    reducer: {
-        user: userReducer,
-        classes: classesReducer,
-        posts: postReducer,
-        mainContent: mainContentToggleReducer,
-        toggleClassDropdown: classDropdownToggleSlice
-    },
+    reducer: rootReducer,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false
     }),
 });
+
+
