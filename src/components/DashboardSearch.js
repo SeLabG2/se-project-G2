@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
 import { resetDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
 import { selectCurrentClass, selectJoinedClasses } from '../features/classes/classSlice';
+import { hideSidebar } from '../features/sidebar/sidebarSlice';
+
 
 function DashboardSearch() {
     const dispatch = useDispatch();
@@ -17,6 +19,7 @@ function DashboardSearch() {
     const currentClass = useSelector(selectCurrentClass);
 
     const handleClick = () => {
+        dispatch(hideSidebar());
         dispatch(toggleContent('new-post'));
         dispatch(resetDropdown());
     }

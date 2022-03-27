@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { resetDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
 import { selectCurrentClass, selectJoinedClasses } from '../features/classes/classSlice';
+import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
 import { updateCurrentDiscussion } from '../features/posts/postSlice';
 
 const DiscussionListContainer = styled.div`
@@ -12,6 +13,14 @@ const DiscussionListContainer = styled.div`
     height: var(--navbar-height);
     display: flex;
     gap: 1em;
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    &::-webkit-scrollbar,
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-thumb {
+        display: none;
+    }
 `
 
 function DiscussionList() {
@@ -22,6 +31,7 @@ function DiscussionList() {
     const handleClick = (discussion) => {
         dispatch(updateCurrentDiscussion(discussion));
         dispatch(resetDropdown());
+        dispatch(toggleContent('other'));
         console.log(discussion);
     }
 

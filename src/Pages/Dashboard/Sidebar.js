@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import DashboardSearch from '../../components/DashboardSearch';
 import PostsList from '../../components/PostsList';
 import { SidebarContainer, OpenMenuIcon, CloseMenuIcon } from '../../components/styled/Sidebar.styled';
-
+import { selectSidebarStatus, toggleSidebar } from '../../features/sidebar/sidebarSlice';
 
 function Sidebar() {
-    const [isSidebarClosed, setIsSidebarClosed] = useState(true);
+    const showSidebar = useSelector(selectSidebarStatus);
+    const dispatch = useDispatch();
+
     return (
         <>
-            {(isSidebarClosed) ?
+            {(!showSidebar) ?
                 <OpenMenuIcon
-                    onClick={() => setIsSidebarClosed(false)}
+                    onClick={() => dispatch(toggleSidebar())}
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -20,7 +23,7 @@ function Sidebar() {
                 </OpenMenuIcon>
                 :
                 <CloseMenuIcon
-                    onClick={() => setIsSidebarClosed(true)}
+                    onClick={() => dispatch(toggleSidebar())}
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -30,7 +33,7 @@ function Sidebar() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </CloseMenuIcon>
             }
-            <SidebarContainer className={(isSidebarClosed) ? "sidebar-is-closed" : ""}>
+            <SidebarContainer className={(showSidebar) ? "" : "sidebar-is-closed"}>
                 <DashboardSearch />
                 <PostsList />
             </SidebarContainer>

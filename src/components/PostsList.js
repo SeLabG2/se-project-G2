@@ -8,6 +8,7 @@ import { getPosts, selectAllPosts, selectCurrentDiscussion } from '../features/p
 import { getColRef } from '../firebase/firebase-firestore';
 import { PostListContainer, StyledPostCard } from './styled/PostList.styled';
 import { resetDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
+import { hideSidebar } from '../features/sidebar/sidebarSlice';
 
 function PostsList() {
     const dispatch = useDispatch();
@@ -65,8 +66,6 @@ function PostsList() {
     }, [currentDiscussion]);
 
 
-
-
     return (
         <PostListContainer>
             {
@@ -76,6 +75,7 @@ function PostsList() {
                         <StyledPostCard
                             key={post.p_id}
                             onClick={() => {
+                                dispatch(hideSidebar());
                                 dispatch(resetDropdown());
                                 dispatch(toggleContent('other'));
                                 navigate(`/dashboard/${c_id}/${post.p_id}`)

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PostDetails from '../../../components/PostDetails';
 import NewPostForm from './NewPostForm';
 import CreateClass from './CreateClass';
@@ -11,6 +11,7 @@ import ResourcesTab from './ResourcesTab';
 import StatisticsTab from './StatisticsTab';
 import ManageClassTab from './ManageClassTab';
 import { Route, Routes } from 'react-router-dom';
+import WelcomePage from './WelcomePage';
 
 function MainContent() {
     const user = useSelector(selectUser);
@@ -18,6 +19,7 @@ function MainContent() {
 
     return (
         <MainContentWrapper>
+
             {mainContent === 'new-post' && <NewPostForm />}
             {user.role === 'instructor' && mainContent === 'create-class' && <CreateClass />}
             {mainContent === 'join-class' && <JoinClass />}
@@ -35,6 +37,7 @@ function MainContent() {
                             &&
                             <Route path={`manage-class`} element={<ManageClassTab />} />
                         }
+                        <Route path="*" element={<WelcomePage />} />
                     </Routes>
                 </>
             }

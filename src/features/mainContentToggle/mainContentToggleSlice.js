@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    value: 'other'
+    value: 'welcome'
 };
 
 export const mainContentToggleSlice = createSlice({
@@ -12,7 +12,7 @@ export const mainContentToggleSlice = createSlice({
             state.value = action.payload;
         },
         resetMainContent: (state) => {
-            state.value = 'other';
+            state.value = 'welcome';
         }
     },
 });

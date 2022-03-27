@@ -6,13 +6,15 @@ import mainContentToggleReducer from '../features/mainContentToggle/mainContentT
 import classDropdownToggleSlice from '../features/classDropdownToggle/classDropdownToggleSlice';
 import classesReducer from '../features/classes/classSlice';
 import postReducer from '../features/posts/postSlice';
+import sidebarReducer from '../features/sidebar/sidebarSlice';
 
 const combinedReducer = combineReducers({
     user: userReducer,
     classes: classesReducer,
     posts: postReducer,
     mainContent: mainContentToggleReducer,
-    toggleClassDropdown: classDropdownToggleSlice
+    toggleClassDropdown: classDropdownToggleSlice,
+    sidebar: sidebarReducer,
 });
 
 
