@@ -18,7 +18,7 @@ function CreateClass() {
         c_size: '',
         c_term: '',
         access_code: '',
-        created_by: user.uid,
+        created_by: user.email,
         discussions: [],
         joined_users: [user.email],
         instructors_list: [user.email],

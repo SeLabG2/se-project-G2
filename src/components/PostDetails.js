@@ -1,5 +1,5 @@
 import React from 'react';
-import Comments from './Comments';
+import Comments from './Comments/Comments';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectAllPosts } from '../features/posts/postSlice';

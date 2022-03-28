@@ -21,6 +21,7 @@ function SignUp() {
     });
     const { username, email, password, confirmPassword, university, role } = formData;
     const [formStep, setFormStep] = useState(0);
+    const [isValidationComplete, setIsValidationComplete] = useState(false);
 
     const user = useSelector(selectUser);
     const { isLoading, isError, isSuccess, message } = useSelector(selectUserStatus);
@@ -63,6 +64,21 @@ function SignUp() {
     }, [user, isError, isSuccess, message, navigate, dispatch]);
 
 
+    useEffect(() => {
+        if (isValidationComplete) {
+            // get id of university
+            const univ = allUniList.filter((uni) => university === uni.name);
+            const userData = {
+                uni_id: univ[0].id,
+                role,
+                username,
+                email,
+                password
+            };
+            dispatch(signup(userData));
+        }
+    }, [isValidationComplete]);
+
     const onChange = (e) => {
         setFormData((prevState) => ({
             ...prevState,
@@ -70,23 +86,18 @@ function SignUp() {
         }));
     };
 
+
+    const onClickOfNextButton = () => {
+
+    };
+
     const onSubmit = async (e) => {
         e.preventDefault();
         // validate the form here
 
 
-        // get id of university
-        const univ = allUniList.filter((uni) => university === uni.name);
-
         // now just create new user and store them in firebase
-        const userData = {
-            uni_id: univ[0].id,
-            role,
-            username,
-            email,
-            password
-        };
-        dispatch(signup(userData));
+        setIsValidationComplete(true);
     };
 
     return (
@@ -127,7 +138,10 @@ function SignUp() {
                                 </StyledLabel>
                             </StyledFormDiv>
                             <StyledButton
-                                onClick={() => setFormStep((currStep) => currStep + 1)}
+                                onClick={() =>
+                                    setFormStep((currStep) => currStep + 1)
+                                }
+
                             >
                                 Next
                             </StyledButton>

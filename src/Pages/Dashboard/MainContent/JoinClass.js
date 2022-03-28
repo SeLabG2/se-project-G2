@@ -28,7 +28,10 @@ function JoinClass() {
     useEffect(() => {
         if (readyToNavigate) {
             if (joinedClasses.length === 1) {
-                navigate(joinedClasses[0].c_id);
+                console.log(`address is : /dashboard/${joinedClasses[0].c_id}`);
+                dispatch(toggleContent('other'));
+                dispatch(resetDropdown());
+                navigate(`/dashboard/${joinedClasses[0].c_id}`);
             }
         }
     }, [readyToNavigate]);
@@ -113,12 +116,12 @@ function JoinClass() {
                             draggable: true,
                             progress: undefined,
                         });
+
+                        dispatch(toggleContent('other'));
+                        dispatch(resetDropdown());
                     }
 
                     setIsSubmitting(false);
-
-                    dispatch(toggleContent('other'));
-                    dispatch(resetDropdown());
 
 
                 } catch (error) {

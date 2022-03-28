@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { selectCurrentClass } from '../features/classes/classSlice';
 import { toggleContent } from '../features/mainContentToggle/mainContentToggleSlice';
-import { getPosts, selectAllPosts, selectCurrentDiscussion } from '../features/posts/postSlice';
+import { getPosts, resetPosts, selectAllPosts, selectCurrentDiscussion } from '../features/posts/postSlice';
 import { getColRef } from '../firebase/firebase-firestore';
 import { PostListContainer, StyledPostCard } from './styled/PostList.styled';
 import { resetDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
@@ -21,47 +21,56 @@ function PostsList() {
     const [filteredPosts, setFilteredPosts] = useState([]);
 
     useEffect(() => {
-        const postColRef = getColRef(`classes/${currentClass?.c_id}/posts`);
-        const postQuery = query(
-            postColRef,
-            orderBy('created_at', 'desc')
-        );
+        if (currentClass != undefined || currentClass !== null) {
+            console.log('currentclass id :', currentClass.c_id);
+            const postColRef = getColRef(`classes/${currentClass?.c_id}/posts`);
+            const postQuery = query(
+                postColRef,
+                orderBy('created_at', 'desc')
+            );
 
-        const unsubscribe = onSnapshot(postQuery, (snapshot) => {
-            const promises = snapshot.docs.map((doc) => {
-                return { ...doc.data(), p_id: doc.id };
-            });
-            Promise.all(promises)
-                .then((posts) => {
-                    dispatch(getPosts(posts));
-                    console.log('all the posts are : ', posts);
-                    if (posts.length !== 0) {
-                        if (currentDiscussion === '') {
-                            setFilteredPosts([...posts]);
+            const unsubscribe = onSnapshot(postQuery, (snapshot) => {
+                const promises = snapshot.docs.map((doc) => {
+                    return { ...doc.data(), p_id: doc.id };
+                });
+                Promise.all(promises)
+                    .then((posts) => {
+                        if (currentClass != undefined || currentClass !== null) {
+                            dispatch(getPosts(posts));
+                            console.log('all the posts are : ', posts);
+                            if (posts.length !== 0) {
+                                if (currentDiscussion === '') {
+                                    setFilteredPosts([...posts]);
+                                } else {
+                                    setFilteredPosts(posts.filter(post => {
+                                        post?.discussion_list.includes(currentDiscussion);
+                                    }));
+                                }
+                            }
                         } else {
-                            setFilteredPosts(posts.filter(post => {
-                                post?.discussion_list.includes(currentDiscussion);
-                            }));
+                            dispatch(resetPosts());
                         }
-                    }
-                    setArePostsLoading(false);
-                })
-                .catch((err) => {
-                    console.log(err.message);
-                })
-        });
+                        setArePostsLoading(false);
+                    })
+                    .catch((err) => {
+                        console.log(err.message);
+                    })
+            });
 
-        return unsubscribe;
-    }, [c_id])
+            return unsubscribe;
+        }
+    }, [currentClass])
 
     useEffect(() => {
         console.log('all posts : ', allPosts);
         if (currentDiscussion === '') {
             setFilteredPosts([...allPosts]);
         } else {
-            setFilteredPosts(allPosts.filter(post => {
-                post?.discussion_list.includes(currentDiscussion);
-            }));
+            const newPostList = allPosts.filter(post => {
+                const isPresent = post?.discussion_list.includes(currentDiscussion);
+                return isPresent;
+            });
+            setFilteredPosts(newPostList);
         }
     }, [currentDiscussion]);
 

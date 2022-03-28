@@ -46,6 +46,9 @@ function Dashboard() {
                             }
                         }
                     }
+                    else {
+                        dispatch(updateCurrentClass(null));
+                    }
                     setIsCurrentClassLoading(false);
                 }).catch((err) => {
                     console.log(err.message);
