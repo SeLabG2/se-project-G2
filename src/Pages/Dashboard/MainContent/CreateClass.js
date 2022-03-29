@@ -21,6 +21,7 @@ function CreateClass() {
         total_posts: 0,
         total_contributions: 0,
         total_anonymous_contributions: 0,
+        total_deleted_contributions: 0,
         created_by: user.email,
         discussions: [],
         joined_users: [user.email],

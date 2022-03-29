@@ -102,6 +102,21 @@ function Comments() {
             .then(() => {
                 const commentListAfterDeleting = backendComments.filter((backendComment) => backendComment.id !== commentId);
                 setBackendComments([...commentListAfterDeleting]);
+
+                const updateStats = async () => {
+                    // update post comment count
+                    const postRef = getDocRefById(p_id, `classes/${c_id}/posts`);
+                    await updateDoc(postRef, {
+                        total_comments: increment(-1)
+                    });
+
+                    // update class contributions
+                    const classDocRef = getDocRefById(c_id, 'classes');
+                    await updateDoc(classDocRef, {
+                        total_deleted_contributions: increment(1)
+                    });
+                }
+                updateStats();
             })
             .catch(err => console.log(err.message));
     }
