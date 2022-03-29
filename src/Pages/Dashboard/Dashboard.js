@@ -43,6 +43,9 @@ function Dashboard() {
                             const currCls = joined_classes.filter(cls => cls.c_id === currentClass?.c_id);
                             if (currCls.length === 0) {
                                 dispatch(updateCurrentClass(joined_classes[0]));
+                            } else {
+                                dispatch((updateCurrentClass(currCls[0])));
+                                console.log('current class after update is : ', currCls[0]);
                             }
                         }
                     }

@@ -152,7 +152,7 @@ function ResourcesTab() {
             {resourceList.length > 0 && resourceList.map((resource) => (
                 <div key={resource.id}>
                     <a href={resource.url} target="_blank">{resource.name}</a>
-                    {user.role === 'instructor' && currentClass.instructors_list.includes(user.email) &&
+                    {user.role === 'instructor' && currentClass?.instructors_list?.includes(user?.email) &&
                         <div onClick={() => { deleteResource(resource) }}>Delete</div>
                     }
                 </div>

@@ -18,7 +18,7 @@ function Comment({ comment, replies, addComment, deleteComment, updateComment, a
             <StyledPostCard>
                 {!isEditing &&
                     <div>
-                        created by : {comment.created_by}
+                        created by : {comment?.show_name_as}
                         <br />
                         body : {comment.body}
                     </div>
@@ -40,7 +40,7 @@ function Comment({ comment, replies, addComment, deleteComment, updateComment, a
             {isReplying && (
                 <CommentForm
                     submitLabel={'Reply'}
-                    handleSubmit={(text) => addComment(text, replyId)}
+                    handleSubmit={(showName, text) => addComment(showName, text, replyId)}
                 />
             )}
             {replies.length > 0 && (

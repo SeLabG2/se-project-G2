@@ -1,4 +1,4 @@
-import { addDoc, setDoc, deleteDoc, getDocs, orderBy, query, serverTimestamp } from 'firebase/firestore';
+import { addDoc, setDoc, deleteDoc, getDocs, orderBy, query, serverTimestamp, increment, where, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -38,13 +38,14 @@ function Comments() {
         return replies;
     }
 
-    const addComment = (text, parentId = null) => {
+    const addComment = (showName, text, parentId = null) => {
         // add to database
         const commentData = {
             body: text,
             created_at: serverTimestamp(),
             updated_at: serverTimestamp(),
             created_by: user.email,
+            show_name_as: showName,
             liked_by: [],
             likes: 0,
             parent_id: parentId,
@@ -56,8 +57,38 @@ function Comments() {
             .then((docRef) => {
                 const newComment = { ...commentData, id: docRef.id }
                 setBackendComments([...backendComments, newComment]);
-            }
-            )
+
+                const individualStatsColRef = getColRef(`classes/${c_id}/individual_stats`);
+                const queryIndividualStats = query(individualStatsColRef, where('user', '==', user.email));
+                const updateStats = async () => {
+                    // update individual contributions
+                    const individualStatsSnapshot = await getDocs(queryIndividualStats);
+                    const id = individualStatsSnapshot.docs.at(0).id;
+                    const individualStatsDocRef = getDocRefById(id, `classes/${c_id}/individual_stats`);
+                    await setDoc(individualStatsDocRef, {
+                        total_contributions: increment(1)
+                    }, { merge: true });
+
+                    // update post comment count
+                    const postRef = getDocRefById(p_id, `classes/${c_id}/posts`);
+                    await updateDoc(postRef, {
+                        total_comments: increment(1)
+                    });
+
+                    // update class contributions
+                    const classDocRef = getDocRefById(c_id, 'classes');
+                    if (showName === 'Anonymous') {
+                        await updateDoc(classDocRef, {
+                            total_anonymous_contributions: increment(1)
+                        });
+                    } else {
+                        await updateDoc(classDocRef, {
+                            total_contributions: increment(1)
+                        });
+                    }
+                }
+                updateStats();
+            })
             .catch(err => console.log(err.message));
 
         setActiveComment(null);
@@ -107,7 +138,7 @@ function Comments() {
             <div>Comment Form</div>
             <CommentForm
                 submitLabel={"COMMENT"}
-                handleSubmit={addComment}
+                handleSubmit={(showName, text) => addComment(showName, text)}
             />
             {rootComments.map((rootComment) => (
                 <Comment

@@ -4,10 +4,11 @@ import { selectCurrentClass } from '../../../features/classes/classSlice';
 import { selectUser } from '../../../features/user/userSlice';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
-import { addDoc, serverTimestamp } from 'firebase/firestore';
-import { getColRef } from '../../../firebase/firebase-firestore';
+import { addDoc, getDocs, increment, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
+import { getColRef, getDocRefById } from '../../../firebase/firebase-firestore';
 import { toggleContent } from '../../../features/mainContentToggle/mainContentToggleSlice';
-import { resetDropdown } from '../../../features/classDropdownToggle/classDropdownToggleSlice'
+import { resetDropdown } from '../../../features/classDropdownToggle/classDropdownToggleSlice';
+import { v4 as uuidV4 } from 'uuid';
 
 function NewPostForm() {
     const dispatch = useDispatch();
@@ -38,6 +39,7 @@ function NewPostForm() {
         instructor_ans: '',
         student_ans: '',
         likes: 0,
+        total_comments: 0,
         show_name_as: '',
     });
 
@@ -58,7 +60,45 @@ function NewPostForm() {
                 try {
                     const postColRef = getColRef(`classes/${currentClass?.c_id}/posts`);
                     addDoc(postColRef, formData)
-                        .then(console.log('post created in database.'))
+                        .then(() => {
+                            console.log('post created in database.');
+
+                            // really important part!
+                            const individualStatsPostIncrement = async () => {
+                                const individualStatsColRef = getColRef(`classes/${currentClass.c_id}/individual_stats`);
+                                const queryIndividualStats = query(individualStatsColRef, where('user', '==', user.email));
+                                const individualStatsSnapshot = await getDocs(queryIndividualStats);
+                                let id;
+                                if (individualStatsSnapshot.docs.length > 0) {
+                                    id = individualStatsSnapshot.docs.at(0).id;
+
+                                } else {
+                                    id = uuidV4();
+                                }
+                                const individualStatsDocRef = getDocRefById(id, `classes/${currentClass.c_id}/individual_stats`);
+                                await setDoc(individualStatsDocRef, {
+                                    user: user.email,
+                                    total_posts: increment(1),
+                                    total_contributions: increment(1)
+                                }, { merge: true });
+                            };
+                            const classStatsPostIncrement = async () => {
+                                const classDocRef = getDocRefById(currentClass.c_id, 'classes');
+                                if (formData.show_name_as === 'Anonymous') {
+                                    await updateDoc(classDocRef, {
+                                        total_posts: increment(1),
+                                        total_anonymous_contributions: increment(1)
+                                    });
+                                } else {
+                                    await updateDoc(classDocRef, {
+                                        total_posts: increment(1),
+                                        total_contributions: increment(1)
+                                    });
+                                    individualStatsPostIncrement();
+                                }
+                            };
+                            classStatsPostIncrement();
+                        })
                     setIsLoading(false);
                     dispatch(toggleContent('other'));
                     dispatch(resetDropdown());

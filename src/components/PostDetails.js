@@ -9,10 +9,17 @@ function PostDetails() {
     const allPosts = useSelector(selectAllPosts);
     const post = allPosts.filter(p => p.p_id === p_id)[0];
 
+    const handleDelete = () => {
+
+    };
+
     return (
         <>
             <div>{`post id from params here : ${p_id}`}</div>
             <div>{`post details are : ${post?.details}`}</div>
+            <br />
+            <strong onClick={handleDelete}>Delete Post!</strong>
+            <br />
             <Comments />
         </>
     );
