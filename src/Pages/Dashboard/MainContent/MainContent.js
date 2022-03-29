@@ -12,10 +12,13 @@ import StatisticsTab from './StatisticsTab';
 import ManageClassTab from './ManageClassTab';
 import { Route, Routes } from 'react-router-dom';
 import WelcomePage from './WelcomePage';
+import { selectCurrentClass } from '../../../features/classes/classSlice';
 
 function MainContent() {
     const user = useSelector(selectUser);
     const mainContent = useSelector(selectMainContent);
+    const currentClass = useSelector(selectCurrentClass);
+    const canManageClass = currentClass?.instructors_list?.includes(user.email);
 
     return (
         <MainContentWrapper>
@@ -33,7 +36,7 @@ function MainContent() {
                         <Route path={`resources`} element={<ResourcesTab />} />
                         <Route path={`statistics`} element={<StatisticsTab />} />
                         {
-                            user.role === 'instructor'
+                            canManageClass
                             &&
                             <Route path={`manage-class`} element={<ManageClassTab />} />
                         }

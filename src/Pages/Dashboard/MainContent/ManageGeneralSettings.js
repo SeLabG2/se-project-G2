@@ -25,7 +25,7 @@ function ManageGeneralSettings() {
 
     return (
         <div>ManageGeneralSettings
-            <div onClick={handleDelete}>Delete Class!</div>
+            <strong onClick={handleDelete}>Delete Class!</strong>
         </div>
     );
 }

@@ -20,6 +20,11 @@ function Navbar() {
     const navigate = useNavigate();
     const showClassDropdown = useSelector(selectShowDropdown);
     const [storeResetDone, setStoreResetDone] = useState(false);
+    const canManageClass = currentClass?.instructors_list?.includes(user.email);
+
+    useEffect(() => {
+        console.log('answer: ', canManageClass);
+    }, []);
 
     useEffect(() => {
         if (isError) {
@@ -122,7 +127,7 @@ function Navbar() {
                                 </NavigationLink>
                             </NavItem>
                             {
-                                user.role === "instructor"
+                                canManageClass
                                 &&
                                 <NavItem>
                                     <NavigationLink
