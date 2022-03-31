@@ -1,21 +1,22 @@
 import { arrayRemove, deleteDoc, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import Discussion from '../../../components/Discussion';
 import { selectCurrentClass } from '../../../features/classes/classSlice';
 import { selectAllPosts } from '../../../features/posts/postSlice';
-import { getColRef, getDocRefById } from '../../../firebase/firebase-firestore';
+import { getDocRefById } from '../../../firebase/firebase-firestore';
 
 function ManageDiscussions() {
     const currentClass = useSelector(selectCurrentClass);
     const discussionList = [...currentClass.discussions];
     const [openEdit, setOpenEdit] = useState(false);
-    const [editedName, setEditedName] = useState('');
     const [newDiscussion, setNewDiscussion] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const allPosts = useSelector(selectAllPosts);
+    const [currentInput, setCurrentInput] = useState('');
 
-    const handleEdit = (e, discussion) => {
+    const handleEdit = (e, discussion, editedName) => {
         e.preventDefault();
 
         setIsEditing(true);
@@ -116,7 +117,7 @@ function ManageDiscussions() {
     };
 
     const resetEdit = () => {
-        setEditedName('');
+        setCurrentInput('');
         setOpenEdit(false);
     }
 
@@ -126,25 +127,15 @@ function ManageDiscussions() {
                 discussionList.length > 0
                     ? discussionList.map(discussion => (
                         <div key={discussion}>
-                            <div>{discussion}</div>
-                            <div onClick={() => {
-                                setOpenEdit(true);
-                                setEditedName(discussion);
-                            }}
-                            >
-                                Edit
-                            </div>
-                            {openEdit && <form onSubmit={(e) => handleEdit(e, discussion)}>
-                                <input
-                                    type="text"
-                                    value={editedName}
-                                    onChange={(e) => setEditedName(e.target.value)}
-                                />
-                                <div>{editedName}</div>
-                                <button disabled={isEditing} type="submit">Update</button>
-                                <button onClick={() => { resetEdit() }}>Cancel</button>
-                            </form>}
-                            <div onClick={() => { handleDelete(discussion) }}>Delete</div>
+                            <Discussion
+                                discussion={discussion}
+                                currentInput={currentInput}
+                                setCurrentInput={setCurrentInput}
+                                handleEdit={handleEdit}
+                                handleDelete={handleDelete}
+                                resetEdit={resetEdit}
+                                isEditing={isEditing}
+                            />
                         </div>
                     ))
                     : (
