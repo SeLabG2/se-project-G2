@@ -14,6 +14,8 @@ function Comments() {
     const [backendComments, setBackendComments] = useState([]);
     const rootComments = backendComments.filter((backendComment) => backendComment.parent_id === null);
     const [activeComment, setActiveComment] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
 
     useEffect(() => {
         // get all comments from backend
@@ -92,34 +94,91 @@ function Comments() {
             .catch(err => console.log(err.message));
 
         setActiveComment(null);
-    }
+    };
+
+    const getChildComments = async (commentId) => {
+        const commentsColRef = getColRef(`classes/${c_id}/posts/${p_id}/comments`);
+        const queryChildComments = query(commentsColRef, where('parent_id', '==', commentId));
+        try {
+            const snapshot = await getDocs(queryChildComments);
+            if (snapshot.docs.length > 0) {
+                const promises = snapshot.docs.map(async (doc) => {
+                    const childCommentDocRef = getDocRefById(doc.id, `classes/${c_id}/posts/${p_id}/comments`);
+
+                    return doc.id;
+                });
+                // remove the child from local list too
+                const localDocDeleteList = await Promise.all(promises);
+                return localDocDeleteList;
+            }
+        } catch (err) {
+            console.log(err.message);
+        }
+    };
 
     const deleteComment = (commentId) => {
         // delete from database
-        const commentsColRef = getColRef(`classes/${c_id}/posts/${p_id}/comments`);
-        const deleteCommentDocRef = getDocRefById(commentId, `classes/${c_id}/posts/${p_id}/comments`);
-        deleteDoc(deleteCommentDocRef)
-            .then(() => {
-                const commentListAfterDeleting = backendComments.filter((backendComment) => backendComment.id !== commentId);
-                setBackendComments([...commentListAfterDeleting]);
+        const deleteCommentStart = async () => {
+            setIsLoading(true);
+            const deleteCommentDocRef = getDocRefById(commentId, `classes/${c_id}/posts/${p_id}/comments`);
+
+            const commentsColRef = getColRef(`classes/${c_id}/posts/${p_id}/comments`);
+            const queryChildComments = query(commentsColRef, where('parent_id', '==', commentId));
+            let deletedCommentsCount = 0;
+            try {
+                const snapshot = await getDocs(queryChildComments);
+                // if there are any child comments then
+                if (snapshot.docs.length > 0) {
+                    const promises = snapshot.docs.map(async (doc) => {
+                        const childCommentDocRef = getDocRefById(doc.id, `classes/${c_id}/posts/${p_id}/comments`);
+                        // delete child comments from db
+                        await deleteDoc(childCommentDocRef);
+                        return doc.id;
+                    });
+
+                    // add the child comments to deleted list
+                    let deletedList = await Promise.all(promises);
+                    deletedCommentsCount = deletedList.length;
+                    // after deleting child comments, delete parent too
+                    await deleteDoc(deleteCommentDocRef);
+
+                    // now add the parent to the local deleted list too
+                    deletedList.push(commentId);
+                    deletedCommentsCount += 1;
+                    // filter the final local list after deleting the comments
+                    const commentListAfterDeleting = backendComments.filter((backendComment) => !deletedList.includes(backendComment.id));
+                    setBackendComments([...commentListAfterDeleting]);
+                } else {
+                    // if there are no child comments, then just delete the parent
+                    await deleteDoc(deleteCommentDocRef);
+                    deletedCommentsCount = 1;
+                    // and filter the final local list after deleting the comments
+                    const commentListAfterDeleting = backendComments.filter((backendComment) => backendComment.id !== commentId);
+                    setBackendComments([...commentListAfterDeleting]);
+                }
 
                 const updateStats = async () => {
                     // update post comment count
                     const postRef = getDocRefById(p_id, `classes/${c_id}/posts`);
                     await updateDoc(postRef, {
-                        total_comments: increment(-1)
+                        total_comments: increment(-deletedCommentsCount)
                     });
 
                     // update class contributions
                     const classDocRef = getDocRefById(c_id, 'classes');
                     await updateDoc(classDocRef, {
-                        total_deleted_contributions: increment(1)
+                        total_deleted_contributions: increment(deletedCommentsCount)
                     });
+
+                    setIsLoading(false);
                 }
                 updateStats();
-            })
-            .catch(err => console.log(err.message));
-    }
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+        deleteCommentStart();
+    };
 
     const updateComment = (text, commentId) => {
         // update comment in database
@@ -148,25 +207,31 @@ function Comments() {
 
     return (
         <>
-            <strong>Comments</strong>
-            <br />
-            <div>Comment Form</div>
-            <CommentForm
-                submitLabel={"COMMENT"}
-                handleSubmit={(showName, text) => addComment(showName, text)}
-            />
-            {rootComments.map((rootComment) => (
-                <Comment
-                    key={rootComment.id}
-                    comment={rootComment}
-                    replies={getReplies(rootComment.id)}
-                    addComment={addComment}
-                    deleteComment={deleteComment}
-                    updateComment={updateComment}
-                    activeComment={activeComment}
-                    setActiveComment={setActiveComment}
-                />
-            ))}
+            {
+                !isLoading
+                &&
+                <>
+                    <strong>Comments</strong>
+                    <br />
+                    <div>Comment Form</div>
+                    <CommentForm
+                        submitLabel={"COMMENT"}
+                        handleSubmit={(showName, text) => addComment(showName, text)}
+                    />
+                    {rootComments.map((rootComment) => (
+                        <Comment
+                            key={rootComment.id}
+                            comment={rootComment}
+                            replies={getReplies(rootComment.id)}
+                            addComment={addComment}
+                            deleteComment={deleteComment}
+                            updateComment={updateComment}
+                            activeComment={activeComment}
+                            setActiveComment={setActiveComment}
+                        />
+                    ))}
+                </>
+            }
         </>
     );
 }

@@ -21,6 +21,10 @@ function Comment({ comment, replies, addComment, deleteComment, updateComment, a
                         created by : {comment?.show_name_as}
                         <br />
                         body : {comment.body}
+                        <br />
+                        parentId : {comment.parent_id}
+                        <br />
+                        commentId : {comment.id}
                     </div>
                 }
                 {isEditing && (

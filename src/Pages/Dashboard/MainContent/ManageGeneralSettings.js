@@ -7,6 +7,7 @@ import { deleteDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { storage } from '../../../firebase/firebase-config';
 import { deleteObject, ref } from 'firebase/storage';
+import { selectAllPosts } from '../../../features/posts/postSlice';
 
 function ManageGeneralSettings() {
     const navigate = useNavigate();
@@ -21,6 +22,7 @@ function ManageGeneralSettings() {
     const [formData, setFormData] = useState(initialFormData);
     const { c_name, c_num, c_size, c_term, access_code } = formData;
     const [isLoading, setIsLoading] = useState(false);
+    const allPosts = useSelector(selectAllPosts);
 
     const onChange = (e) => {
         setFormData((prevState) => ({
@@ -38,10 +40,47 @@ function ManageGeneralSettings() {
             const resourceColRef = getColRef(`classes/${class_id}/resources`);
             const deleteClass = async () => {
                 try {
+                    // delete resources collection from db
                     const resourceSnapshot = await getDocs(resourceColRef);
-                    const resourcePaths = resourceSnapshot.docs.map(resource => {
+                    const resourcePaths = resourceSnapshot.docs.map(async (resource) => {
+                        const resourceDocRef = getDocRefById(resource.id, `classes/${class_id}/resources`);
+                        await deleteDoc(resourceDocRef);
                         return `/resources/${class_id}/${resource.data().name}`
-                    })
+                    });
+
+                    const postIds = allPosts.map(post => post.p_id);
+                    // delete comments collection
+                    if (postIds.length > 0) {
+
+                        postIds.map(async (postId) => {
+                            // get each post id, and for that id, delete all comments inside the post
+                            const commentsColRef = getColRef(`classes/${class_id}/posts/${postId}`);
+                            const commentsSnapshot = await getDocs(commentsColRef);
+                            if (commentsSnapshot.docs.length > 0) {
+                                commentsSnapshot.docs.map(async (doc) => {
+                                    const commentsDocRef = getDocRefById(doc.id, `classes/${class_id}/posts/${postId}/comments`);
+                                    await deleteDoc(commentsDocRef);
+                                });
+                            }
+
+                            // after deleting all comments of the post, delete the given post as well
+                            const postDocRef = getDocRefById(postId, `classes/${class_id}/posts`);
+                            await deleteDoc(postDocRef);
+                        });
+                    }
+
+                    // after this delete individual stats
+                    const individualStatsColRef = getColRef(`classes/${class_id}/individual_stats`);
+                    const individualStatsSnapshot = await getDocs(individualStatsColRef);
+
+                    // if snapshot exists, delete all documents
+                    if (individualStatsSnapshot.docs.length > 0) {
+                        individualStatsSnapshot.docs.map(async (doc) => {
+                            const individualStatsDocRef = getDocRefById(doc.id, `classes/${class_id}/individual_stats`);
+                            await deleteDoc(individualStatsDocRef);
+                        });
+                    }
+
                     // now delete the class
                     await deleteDoc(classDocRef);
 

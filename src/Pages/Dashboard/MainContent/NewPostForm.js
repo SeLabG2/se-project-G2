@@ -25,7 +25,7 @@ function NewPostForm() {
         { value: user.email, label: user.email },
     ];
     // if current class has anonymity on
-    if (currentClass.anonymity) {
+    if (currentClass?.anonymity) {
         nameOptions.push({ value: 'Anonymous', label: 'Anonymous' });
     }
 
