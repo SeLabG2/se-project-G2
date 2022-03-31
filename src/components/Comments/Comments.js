@@ -6,7 +6,7 @@ import { selectUser } from '../../features/user/userSlice';
 import { getColRef, getDocRefById } from '../../firebase/firebase-firestore';
 import Comment from './Comment';
 import CommentForm from './CommentForm';
-
+import { v4 as uuidV4 } from 'uuid';
 
 function Comments() {
     const user = useSelector(selectUser);
@@ -60,16 +60,30 @@ function Comments() {
                 const newComment = { ...commentData, id: docRef.id }
                 setBackendComments([...backendComments, newComment]);
 
-                const individualStatsColRef = getColRef(`classes/${c_id}/individual_stats`);
-                const queryIndividualStats = query(individualStatsColRef, where('user', '==', user.email));
                 const updateStats = async () => {
                     // update individual contributions
-                    const individualStatsSnapshot = await getDocs(queryIndividualStats);
-                    const id = individualStatsSnapshot.docs.at(0).id;
-                    const individualStatsDocRef = getDocRefById(id, `classes/${c_id}/individual_stats`);
-                    await setDoc(individualStatsDocRef, {
-                        total_contributions: increment(1)
-                    }, { merge: true });
+                    const individualStatsCommentsIncrement = async () => {
+                        const individualStatsColRef = getColRef(`classes/${c_id}/individual_stats`);
+                        const queryIndividualStats = query(individualStatsColRef, where('user', '==', user.email));
+                        const individualStatsSnapshot = await getDocs(queryIndividualStats);
+                        let id;
+                        if (individualStatsSnapshot.docs.length > 0) {
+                            id = individualStatsSnapshot.docs.at(0).id;
+                        } else {
+                            // if in case the person had anonymous posts or contributions before, this will create new individual stats for them
+                            id = uuidV4();
+                        }
+                        const individualStatsDocRef = getDocRefById(id, `classes/${c_id}/individual_stats`);
+                        await setDoc(individualStatsDocRef, {
+                            user: user.email,
+                            total_posts: increment(1),
+                            total_contributions: increment(1)
+                        }, { merge: true });
+                    }
+
+                    if (showName !== 'Anonymous') {
+                        individualStatsCommentsIncrement();
+                    }
 
                     // update post comment count
                     const postRef = getDocRefById(p_id, `classes/${c_id}/posts`);
