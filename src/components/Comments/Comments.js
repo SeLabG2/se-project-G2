@@ -110,26 +110,6 @@ function Comments() {
         setActiveComment(null);
     };
 
-    const getChildComments = async (commentId) => {
-        const commentsColRef = getColRef(`classes/${c_id}/posts/${p_id}/comments`);
-        const queryChildComments = query(commentsColRef, where('parent_id', '==', commentId));
-        try {
-            const snapshot = await getDocs(queryChildComments);
-            if (snapshot.docs.length > 0) {
-                const promises = snapshot.docs.map(async (doc) => {
-                    const childCommentDocRef = getDocRefById(doc.id, `classes/${c_id}/posts/${p_id}/comments`);
-
-                    return doc.id;
-                });
-                // remove the child from local list too
-                const localDocDeleteList = await Promise.all(promises);
-                return localDocDeleteList;
-            }
-        } catch (err) {
-            console.log(err.message);
-        }
-    };
-
     const deleteComment = (commentId) => {
         // delete from database
         const deleteCommentStart = async () => {

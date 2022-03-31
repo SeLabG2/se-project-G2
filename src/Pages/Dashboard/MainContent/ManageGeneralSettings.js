@@ -42,32 +42,11 @@ function ManageGeneralSettings() {
                 try {
                     // delete resources collection from db
                     const resourceSnapshot = await getDocs(resourceColRef);
-                    const resourcePaths = resourceSnapshot.docs.map(async (resource) => {
+                    const resourcePaths = await Promise.all(resourceSnapshot.docs.map(async (resource) => {
                         const resourceDocRef = getDocRefById(resource.id, `classes/${class_id}/resources`);
                         await deleteDoc(resourceDocRef);
                         return `/resources/${class_id}/${resource.data().name}`
-                    });
-
-                    const postIds = allPosts.map(post => post.p_id);
-                    // delete comments collection
-                    if (postIds.length > 0) {
-
-                        postIds.map(async (postId) => {
-                            // get each post id, and for that id, delete all comments inside the post
-                            const commentsColRef = getColRef(`classes/${class_id}/posts/${postId}`);
-                            const commentsSnapshot = await getDocs(commentsColRef);
-                            if (commentsSnapshot.docs.length > 0) {
-                                commentsSnapshot.docs.map(async (doc) => {
-                                    const commentsDocRef = getDocRefById(doc.id, `classes/${class_id}/posts/${postId}/comments`);
-                                    await deleteDoc(commentsDocRef);
-                                });
-                            }
-
-                            // after deleting all comments of the post, delete the given post as well
-                            const postDocRef = getDocRefById(postId, `classes/${class_id}/posts`);
-                            await deleteDoc(postDocRef);
-                        });
-                    }
+                    }));
 
                     // after this delete individual stats
                     const individualStatsColRef = getColRef(`classes/${class_id}/individual_stats`);
@@ -75,14 +54,31 @@ function ManageGeneralSettings() {
 
                     // if snapshot exists, delete all documents
                     if (individualStatsSnapshot.docs.length > 0) {
-                        individualStatsSnapshot.docs.map(async (doc) => {
+                        await Promise.all(individualStatsSnapshot.docs.map(async (doc) => {
                             const individualStatsDocRef = getDocRefById(doc.id, `classes/${class_id}/individual_stats`);
                             await deleteDoc(individualStatsDocRef);
-                        });
+                        }));
                     }
 
-                    // now delete the class
-                    await deleteDoc(classDocRef);
+                    const postIds = allPosts.map(post => post.p_id);
+                    // delete comments collection
+                    if (postIds.length > 0) {
+
+                        await Promise.all(postIds.map(async (postId) => {
+                            // get each post id, and for that id, delete all comments inside the post
+                            const commentsColRef = getColRef(`classes/${class_id}/posts/${postId}/comments`);
+                            const commentsSnapshot = await getDocs(commentsColRef);
+                            if (commentsSnapshot.docs.length > 0) {
+                                await Promise.all(commentsSnapshot.docs.map(async (doc) => {
+                                    const commentsDocRef = getDocRefById(doc.id, `classes/${class_id}/posts/${postId}/comments`);
+                                    await deleteDoc(commentsDocRef);
+                                }));
+                            }
+                            // after deleting all comments of the post, delete the given post as well
+                            const postDocRef = getDocRefById(postId, `classes/${class_id}/posts`);
+                            await deleteDoc(postDocRef);
+                        }));
+                    }
 
                     // now delete all the resources from the storage bucket
                     const promises = resourcePaths.map(async (path) => {
@@ -90,8 +86,14 @@ function ManageGeneralSettings() {
                         await deleteObject(resourceRef);
                     });
                     await Promise.all(promises);
-                    console.log('class deleted.');
-                    navigate('/');
+
+                    // now delete the class
+                    deleteDoc(classDocRef)
+                        .then(() => {
+                            navigate('/');
+                        })
+                        .catch(err => console.log(err.message))
+
                 } catch (err) {
                     console.log(err.message);
                 }
