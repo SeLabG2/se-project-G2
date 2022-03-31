@@ -13,10 +13,12 @@ function ManageClassTab() {
     return (
         <>
             <strong onClick={() => { dispatch(toggleManageClass('general')) }}>ManageGeneralSettings</strong>
+            <strong onClick={() => { dispatch(toggleManageClass('QnA')) }}>ManageQnA</strong>
             <strong onClick={() => { dispatch(toggleManageClass('discussions')) }}>ManageDiscussions</strong>
             <strong onClick={() => { dispatch(toggleManageClass('enrollment')) }}>ManageEnrollment</strong>
 
             {manageClassToggle === 'general' && <ManageGeneralSettings />}
+            {manageClassToggle === 'QnA' && <ManageQnA />}
             {manageClassToggle === 'discussions' && <ManageDiscussions />}
             {manageClassToggle === 'enrollment' && <ManageEnrollment />}
         </>

@@ -14,15 +14,21 @@ function NewPostForm() {
     const dispatch = useDispatch();
     const currentClass = useSelector(selectCurrentClass);
     const user = useSelector(selectUser);
+
     const discussions = currentClass?.discussions.map(discussion => ({
         value: discussion,
         label: discussion,
     }));
     const [discussionList, setDiscussionList] = useState([]);
-    const nameOptions = [
+
+    let nameOptions = [
         { value: user.email, label: user.email },
-        { value: 'Anonymous', label: 'Anonymous' }
     ];
+    // if current class has anonymity on
+    if (currentClass.anonymity) {
+        nameOptions.push({ value: 'Anonymous', label: 'Anonymous' });
+    }
+
     const [showName, setShowName] = useState('');
     const [isValidationComplete, setIsValidationComplete] = useState(false);
     const [isLoading, setIsLoading] = useState(false);

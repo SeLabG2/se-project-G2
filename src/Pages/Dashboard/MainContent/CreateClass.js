@@ -28,6 +28,7 @@ function CreateClass() {
         total_anonymous_contributions: 0,
         total_deleted_contributions: 0,
         created_by: user.email,
+        anonymity: true,
         discussions: [],
         joined_users: [user.email],
         instructors_list: [user.email],
@@ -36,7 +37,9 @@ function CreateClass() {
     const [formData, setFormData] = useState(initialFormData);
     const [attendanceList, setAttendanceList] = useState('');
 
-    const { c_name, c_num, c_size, c_term, access_code } = formData;
+    const { c_name, c_num, c_size, c_term, anonymity, access_code } = formData;
+    const [anonymous, setAnonymous] = useState(anonymity);
+    const isAnonymous = (anonymous) ? true : false;
 
     const [isValidationComplete, setIsValidationComplete] = useState(false);
     const [readyToNavigate, setReadyToNavigate] = useState(false);
@@ -111,6 +114,7 @@ function CreateClass() {
             const updatedFormData = {
                 ...prevState,
                 joined_users: [...test],
+                anonymity: anonymous,
             };
             setIsValidationComplete(true);
             return updatedFormData;
@@ -118,7 +122,12 @@ function CreateClass() {
 
         // store class in database after validation
 
-    }
+    };
+
+    const handleRadioClick = () => {
+        setAnonymous(prev => !prev);
+    };
+
     return (
         <>
             <div>CreateClass</div>
@@ -172,6 +181,35 @@ function CreateClass() {
                             value={access_code}
                             onChange={onChange}
                         />
+                    </div>
+                    <div>
+                        Class Anonymity :
+                        <div>
+                            <label htmlFor="anonymity-true">
+                                <input
+                                    type="radio"
+                                    id='anonymity-true'
+                                    name='anonymity'
+                                    value={anonymous}
+                                    checked={isAnonymous}
+                                    onChange={handleRadioClick}
+                                />
+                                TRUE
+                            </label>
+                        </div>
+                        <div>
+                            <label htmlFor="anonymity-false">
+                                <input
+                                    type="radio"
+                                    id='anonymity-false'
+                                    name='anonymity'
+                                    value={anonymous}
+                                    checked={!isAnonymous}
+                                    onChange={handleRadioClick}
+                                />
+                                FALSE
+                            </label>
+                        </div>
                     </div>
                     <div>
                         <p>Attendance list :</p>

@@ -49,7 +49,7 @@ function ManageGeneralSettings() {
                     const promises = resourcePaths.map(async (path) => {
                         const resourceRef = ref(storage, path);
                         await deleteObject(resourceRef);
-                    })
+                    });
                     await Promise.all(promises);
                     console.log('class deleted.');
                     navigate('/');
@@ -58,17 +58,6 @@ function ManageGeneralSettings() {
                 }
             };
             deleteClass();
-            deleteDoc(classDocRef)
-                .then(() => {
-                    const resourcesRef = ref(storage, `/resources/${class_id}`);
-                    deleteObject(resourcesRef)
-                        .then(() => {
-                            // Class Resources deleted successfully
-                            console.log('class deleted.');
-                            navigate('/');
-                        })
-                })
-                .catch(err => console.log(err.message))
         }
     }
 
