@@ -32,7 +32,7 @@ function Comment({ comment, replies, addComment, deleteComment, updateComment, a
                         submitLabel={'Update'}
                         hasCancelButton
                         initialText={comment.body}
-                        handleSubmit={(text) => updateComment(text, comment.id)}
+                        handleSubmit={(showName, text) => updateComment(showName, text, comment.id)}
                         handleCancel={() => setActiveComment(null)}
                     />
                 )}

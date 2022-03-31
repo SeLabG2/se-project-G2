@@ -51,10 +51,16 @@ function PostDetails() {
         }
     };
 
+    const handleEdit = () => {
+
+    };
+
     return (
         <>
             <div>{`post id from params here : ${p_id}`}</div>
             <div>{`post details are : ${post?.details}`}</div>
+            <br />
+            <strong onClick={handleEdit}>Edit</strong>
             <br />
             <strong onClick={handleDelete}>Delete Post!</strong>
             <br />

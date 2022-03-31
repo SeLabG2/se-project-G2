@@ -174,29 +174,37 @@ function Comments() {
         deleteCommentStart();
     };
 
-    const updateComment = (text, commentId) => {
+    const updateComment = (showName, text, commentId) => {
         // update comment in database
 
-        console.log('comment updated.');
-        // const commentData = backendComments.filter((backendComment) => backendComment.id === commentId)[0];
-        // const updatedComment = {
-        //     ...commentData,
-        //     body: text,
-        //     updated_at: serverTimestamp(),
-        // };
-        // const updateCommentDocRef = getDocRefById(commentId, `classes/${c_id}/posts/${p_id}/comments`);
-        // setDoc(updateCommentDocRef, updatedComment)
-        //     .then(() => {
-        //         const updatedBackendComments = backendComments.map((backendComment) => {
-        //             if (backendComment.id === commentId) {
-        //                 return updatedComment;
-        //             }
-        //         });
-        //         setBackendComments(updatedBackendComments);
-        //     })
-        //     .catch(err => console.log(err.message));
+        setIsLoading(true);
+        const commentData = backendComments.filter((backendComment) => backendComment.id === commentId)[0];
+        const updatedComment = {
+            ...commentData,
+            body: text,
+            show_name_as: showName,
+            updated_at: serverTimestamp(),
+        };
+        const updateCommentDocRef = getDocRefById(commentId, `classes/${c_id}/posts/${p_id}/comments`);
+        setDoc(updateCommentDocRef, updatedComment)
+            .then(() => {
+                const updatedBackendComments = backendComments.map((backendComment) => {
+                    if (backendComment.id === commentId) {
+                        return updatedComment;
+                    } else {
+                        return backendComment;
+                    }
+                });
+                setBackendComments(updatedBackendComments);
+                setIsLoading(false);
+                setActiveComment(null);
+            })
+            .catch(err => {
+                console.log(err.message);
+                setIsLoading(false);
+                setActiveComment(null);
+            });
 
-        setActiveComment(null);
     }
 
     return (
