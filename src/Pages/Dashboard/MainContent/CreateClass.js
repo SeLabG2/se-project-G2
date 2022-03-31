@@ -101,6 +101,12 @@ function CreateClass() {
         }
 
         console.log('test value outside if is : ', test);
+        // check if total class size exceeds
+        if (test.length + 1 > c_size) {
+            alert('Attendance list exceeds class size. Please remove some users from the list or change the class size.');
+            return;
+        }
+
         setFormData((prevState) => {
             const updatedFormData = {
                 ...prevState,

@@ -94,6 +94,18 @@ function JoinClass() {
 
                     if (class_id != undefined && class_id !== null) {
                         let new_joined_users = querySnapshot.docs[0]?.data().joined_users;
+                        if (new_joined_users.length + 1 > parseInt(querySnapshot.docs[0]?.data().c_size)) {
+                            toast(`This class is full... cannot join.`, {
+                                position: "top-center",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                            });
+                            return;
+                        }
                         new_joined_users?.push(user.email);
                         const classDocRef = getDocRefById(class_id, 'classes');
                         await updateDoc(classDocRef, {

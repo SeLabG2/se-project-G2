@@ -30,8 +30,7 @@ function StatisticsTab() {
     }, [])
 
     return (
-        <div>StatisticsTab
-            <br />
+        <div>
             <div>Overall Class Statistics</div>
             {`total posts : ${currentClass.total_posts}\n`}
             {`total contributions : ${currentClass.total_contributions}\n`}
