@@ -8,6 +8,7 @@ import { selectUser } from '../../../features/user/userSlice';
 import { toggleContent } from '../../../features/mainContentToggle/mainContentToggleSlice';
 import { resetDropdown } from '../../../features/classDropdownToggle/classDropdownToggleSlice';
 import { useNavigate } from 'react-router-dom';
+import Select from 'react-select';
 
 function JoinClass() {
     const [formData, setFormData] = useState({
@@ -23,6 +24,11 @@ function JoinClass() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [readyToNavigate, setReadyToNavigate] = useState(false);
+    const [joinAs, setJoinAs] = useState('student');
+    const joinAsOptions = [
+        { value: 'student', label: 'student' },
+        { value: 'instructor', label: 'Anonymous' }
+    ];
 
 
     useEffect(() => {
@@ -108,9 +114,18 @@ function JoinClass() {
                         }
                         new_joined_users?.push(user.email);
                         const classDocRef = getDocRefById(class_id, 'classes');
-                        await updateDoc(classDocRef, {
-                            joined_users: [...new_joined_users]
-                        });
+                        if (joinAs === 'instructor') {
+                            let new_instructors_list = querySnapshot.docs[0]?.data().instructors_list;
+                            new_instructors_list?.push(user.email);
+                            await updateDoc(classDocRef, {
+                                instructors_list: [...new_instructors_list],
+                                joined_users: [...new_joined_users]
+                            });
+                        } else {
+                            await updateDoc(classDocRef, {
+                                joined_users: [...new_joined_users]
+                            });
+                        }
 
                         toast(`You've successfully joined this class... check your classes.`, {
                             position: "top-center",
@@ -211,6 +226,19 @@ function JoinClass() {
                             onChange={onChange}
                         />
                     </div>
+
+                    {/* {
+                        user.role === 'instructor'
+                        &&
+                        <div>
+                            <p>Join as : </p>
+                            <Select
+                                options={joinAsOptions}
+                                onChange={setJoinAs}
+                                placeholder='Please select an option'
+                            />
+                        </div>
+                    } */}
                     <button disabled={isSubmitting} type="submit">Join Class!</button>
                 </form>
             </div>

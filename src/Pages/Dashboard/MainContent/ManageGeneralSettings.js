@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentClass } from '../../../features/classes/classSlice';
 import styled from 'styled-components';
 import { getColRef, getDocRefById } from '../../../firebase/firebase-firestore';
-import { deleteDoc, getDocs } from 'firebase/firestore';
+import { deleteDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { storage } from '../../../firebase/firebase-config';
 import { deleteObject, ref } from 'firebase/storage';
@@ -11,6 +11,23 @@ import { deleteObject, ref } from 'firebase/storage';
 function ManageGeneralSettings() {
     const navigate = useNavigate();
     const currentClass = useSelector(selectCurrentClass);
+    const initialFormData = {
+        c_name: currentClass.c_name,
+        c_num: currentClass.c_num,
+        c_size: currentClass.c_size,
+        c_term: currentClass.c_term,
+        access_code: currentClass.access_code
+    };
+    const [formData, setFormData] = useState(initialFormData);
+    const { c_name, c_num, c_size, c_term, access_code } = formData;
+    const [isLoading, setIsLoading] = useState(false);
+
+    const onChange = (e) => {
+        setFormData((prevState) => ({
+            ...prevState,
+            [e.target.name]: e.target.value,
+        }));
+    };
 
     const handleDelete = () => {
         const isOkayToDelete = window.confirm("Are you sure you want to delete the class?\n",
@@ -55,8 +72,88 @@ function ManageGeneralSettings() {
         }
     }
 
+    const onSubmit = (e) => {
+        e.preventDefault();
+
+        if (c_size < currentClass.size) {
+            alert('Class size is less than number of joined users.. please drop some users and then try updating the class size');
+            return;
+        }
+
+        setIsLoading(true);
+
+        const classDocRef = getDocRefById(currentClass.c_id, 'classes');
+        updateDoc(classDocRef, {
+            c_name: formData.c_name,
+            c_num: formData.c_num,
+            c_size: formData.c_size,
+            c_term: formData.c_term,
+            access_code: formData.access_code,
+        })
+            .then(() => {
+                console.log('class updated.');
+                setIsLoading(false);
+            })
+            .catch(err => {
+                console.log(err.message);
+                setIsLoading(false);
+            })
+    };
+
     return (
         <div>ManageGeneralSettings
+            <form onSubmit={onSubmit}>
+                <div>
+                    <p>Class Name :</p>
+                    <input
+                        type="text"
+                        name='c_name'
+                        value={c_name}
+                        onChange={(onChange)}
+                        required
+                    />
+                </div>
+                <div>
+                    <p>Class Number :</p>
+                    <input
+                        type="text"
+                        name='c_num'
+                        value={c_num}
+                        onChange={onChange}
+                        required
+                    />
+                </div>
+                <div>
+                    <p>Class Size :</p>
+                    <input
+                        type="number"
+                        name='c_size'
+                        value={c_size}
+                        onChange={onChange}
+                        required
+                    />
+                </div>
+                <div>
+                    <p>Class Term :</p>
+                    <input
+                        type="text"
+                        name='c_term'
+                        value={c_term}
+                        onChange={onChange}
+                        required
+                    />
+                </div>
+                <div>
+                    <p>Access Code (optional) :</p>
+                    <input
+                        type="text"
+                        name='access_code'
+                        value={access_code}
+                        onChange={onChange}
+                    />
+                </div>
+                <button disabled={isLoading} type="submit">Update</button>
+            </form>
             <strong onClick={handleDelete}>Delete Class!</strong>
         </div>
     );
