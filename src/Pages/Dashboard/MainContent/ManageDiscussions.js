@@ -1,8 +1,9 @@
-import { arrayRemove, updateDoc } from 'firebase/firestore';
+import { arrayRemove, deleteDoc, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentClass } from '../../../features/classes/classSlice';
-import { getDocRefById } from '../../../firebase/firebase-firestore';
+import { selectAllPosts } from '../../../features/posts/postSlice';
+import { getColRef, getDocRefById } from '../../../firebase/firebase-firestore';
 
 function ManageDiscussions() {
     const currentClass = useSelector(selectCurrentClass);
@@ -12,6 +13,7 @@ function ManageDiscussions() {
     const [newDiscussion, setNewDiscussion] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
+    const allPosts = useSelector(selectAllPosts);
 
     const handleEdit = (e, discussion) => {
         e.preventDefault();
@@ -25,7 +27,25 @@ function ManageDiscussions() {
         updateDoc(classDocRef, {
             discussions: [...newDiscussionList]
         })
-            .then(() => {
+            .then(async () => {
+                // now edit this discussion in all posts too
+                const filteredPosts = allPosts.map(post => {
+                    // if post's discussion list has this discussion,
+                    if (post.discussion_list.includes(discussion)) {
+                        // then remove that discussion and add updated discussion to it return the new list
+                        const postDiscussions = post.discussion_list.filter(dis => dis !== discussion);
+                        return { id: post.p_id, post_discussions: [editedName, ...postDiscussions] }
+                    }
+                });
+
+                // now just update all posts with given ids
+                await filteredPosts.map(async (post) => {
+                    const postDocRef = getDocRefById(post.id, `classes/${currentClass.c_id}/posts`);
+                    await updateDoc(postDocRef, {
+                        discussion_list: [...post.post_discussions]
+                    })
+                });
+
                 setIsEditing(false);
                 resetEdit();
             })
@@ -40,10 +60,24 @@ function ManageDiscussions() {
 
     const handleDelete = (discussion) => {
         const classDocRef = getDocRefById(currentClass.c_id, 'classes');
+
         updateDoc(classDocRef, {
             discussions: arrayRemove(discussion)
         })
-            .then(() => {
+            .then(async () => {
+                // now remove this discussion from all the posts too
+                const filteredPosts = allPosts.map(post => {
+                    if (post.discussion_list.includes(discussion)) {
+                        return post.p_id
+                    }
+                });
+
+                await filteredPosts.map(async (id) => {
+                    const postDocRef = getDocRefById(id, `classes/${currentClass.c_id}/posts`);
+                    await updateDoc(postDocRef, {
+                        discussion_list: arrayRemove(discussion)
+                    })
+                });
                 resetEdit();
             })
             .catch(err => {

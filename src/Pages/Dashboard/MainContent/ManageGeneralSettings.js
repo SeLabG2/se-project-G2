@@ -101,7 +101,7 @@ function ManageGeneralSettings() {
     };
 
     return (
-        <div>ManageGeneralSettings
+        <div>
             <form onSubmit={onSubmit}>
                 <div>
                     <p>Class Name :</p>
