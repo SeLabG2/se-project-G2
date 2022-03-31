@@ -27,14 +27,19 @@ function JoinClass() {
 
     useEffect(() => {
         if (readyToNavigate) {
+            console.log('joinedClasses : ', joinedClasses);
             if (joinedClasses.length === 1) {
                 console.log(`address is : /dashboard/${joinedClasses[0].c_id}`);
                 dispatch(toggleContent('other'));
                 dispatch(resetDropdown());
                 navigate(`/dashboard/${joinedClasses[0].c_id}`);
+            } else {
+                console.log('I am here');
+                dispatch(toggleContent('other'));
+                dispatch(resetDropdown());
             }
         }
-    }, [readyToNavigate]);
+    }, [joinedClasses]);
 
     const onChange = (e) => {
         setFormData((prevState) => ({

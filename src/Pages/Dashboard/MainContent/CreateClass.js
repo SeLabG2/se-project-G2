@@ -4,11 +4,16 @@ import { selectUser } from '../../../features/user/userSlice';
 import { getColRef } from '../../../firebase/firebase-firestore';
 import { addDoc, serverTimestamp } from 'firebase/firestore';
 import { toggleContent } from '../../../features/mainContentToggle/mainContentToggleSlice';
+import { selectJoinedClasses } from '../../../features/classes/classSlice';
+import { resetDropdown } from '../../../features/classDropdownToggle/classDropdownToggleSlice';
+import { useNavigate } from 'react-router-dom';
 
 function CreateClass() {
     const user = useSelector(selectUser);
+    const joinedClasses = useSelector(selectJoinedClasses);
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const initialFormData = {
         created_at: serverTimestamp(),
@@ -34,6 +39,7 @@ function CreateClass() {
     const { c_name, c_num, c_size, c_term, access_code } = formData;
 
     const [isValidationComplete, setIsValidationComplete] = useState(false);
+    const [readyToNavigate, setReadyToNavigate] = useState(false);
 
     useEffect(() => {
         if (isValidationComplete) {
@@ -42,10 +48,11 @@ function CreateClass() {
                 try {
                     const classColRef = getColRef('classes');
                     addDoc(classColRef, formData)
-                        .then(console.log('class created in database.'))
-
-                    setIsLoading(false);
-                    dispatch(toggleContent('other'));
+                        .then(() => {
+                            console.log('class created in database.');
+                            setIsLoading(false);
+                            setReadyToNavigate(true);
+                        })
                 } catch (err) {
                     console.log(err.message);
                     setIsLoading(false);
@@ -54,6 +61,22 @@ function CreateClass() {
             createClass();
         }
     }, [isValidationComplete]);
+
+    useEffect(() => {
+        if (readyToNavigate) {
+            console.log('joinedClasses : ', joinedClasses);
+            if (joinedClasses.length === 1) {
+                console.log(`address is : /dashboard/${joinedClasses[0].c_id}`);
+                dispatch(toggleContent('other'));
+                dispatch(resetDropdown());
+                navigate(`/dashboard/${joinedClasses[0].c_id}`);
+            } else {
+                console.log('I am here');
+                dispatch(toggleContent('other'));
+                dispatch(resetDropdown());
+            }
+        }
+    }, [joinedClasses]);
 
     const onChange = (e) => {
         setFormData((prevState) => ({

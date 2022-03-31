@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    value: 'welcome'
+    main_content: 'welcome',
+    manage_class: 'general'
 };
 
 export const mainContentToggleSlice = createSlice({
@@ -9,19 +10,24 @@ export const mainContentToggleSlice = createSlice({
     initialState,
     reducers: {
         toggleContent: (state, action) => {
-            state.value = action.payload;
+            state.main_content = action.payload;
+        },
+        toggleManageClass: (state, action) => {
+            state.manage_class = action.payload;
         },
         resetMainContent: (state) => {
-            state.value = 'welcome';
+            state.main_content = 'welcome';
+            state.manage_class = 'general';
         }
     },
 });
 
 // actions
-export const { toggleContent, resetMainContent } = mainContentToggleSlice.actions;
+export const { toggleContent, toggleManageClass, resetMainContent } = mainContentToggleSlice.actions;
 
 // selector
-export const selectMainContent = (state) => state.mainContent.value;
+export const selectMainContent = (state) => state.mainContent.main_content;
+export const selectManageClass = (state) => state.mainContent.manage_class;
 
 // reducer
 export default mainContentToggleSlice.reducer;

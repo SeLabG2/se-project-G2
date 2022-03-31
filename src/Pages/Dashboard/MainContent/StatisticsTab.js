@@ -38,11 +38,17 @@ function StatisticsTab() {
             {`total anonymous contributions : ${currentClass.total_anonymous_contributions}\n`}
             {`total deleted contributions : ${currentClass.total_deleted_contributions}\n`}
             <br />
-            <div>My Stats</div>
-            <pre>{JSON.stringify(myStats[0], null, 2)}</pre>
-            <br />
+            {myStats.length > 0 &&
+                <>
+                    <div>My Stats</div>
+                    <pre>{JSON.stringify(myStats[0], null, 2)}</pre>
+                    <br />
+                </>
+            }
             {
                 isOnInstructorList
+                &&
+                individualStatsList.length > 0
                 &&
                 <>
                     <div>Individual Stats of Students/Instructors enrolled in this class</div>
