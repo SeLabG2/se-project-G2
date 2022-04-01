@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectAllPosts } from '../features/posts/postSlice';
 import { getColRef, getDocRefById } from '../firebase/firebase-firestore';
-import { deleteDoc, getDocs, increment, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, deleteDoc, getDocs, increment, serverTimestamp, updateDoc } from 'firebase/firestore';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { selectCurrentClass } from '../features/classes/classSlice';
@@ -18,6 +18,9 @@ function PostDetails() {
     const [openEdit, setOpenEdit] = useState(false);
     const currentClass = useSelector(selectCurrentClass);
     const user = useSelector(selectUser);
+    const isLikedByMe = post.liked_by.includes(user.email);
+    const [isLiked, setIsLiked] = useState(isLikedByMe);
+    const [isUpdatingLikes, setIsUpdatingLikes] = useState(false);
 
     const discussions = currentClass?.discussions.map(discussion => ({
         value: discussion,
@@ -144,6 +147,34 @@ function PostDetails() {
         });
     };
 
+    const likePost = () => {
+        const postDocRef = getDocRefById(post.p_id, `classes/${currentClass.c_id}/posts`);
+        setIsUpdatingLikes(true);
+        if (!isLiked) {
+            const likeIt = async () => {
+                // increment post's like count by 1 and store user's email in post's liked_by array
+                await updateDoc(postDocRef, {
+                    likes: increment(1),
+                    liked_by: arrayUnion(user.email)
+                });
+                setIsLiked(true);
+                setIsUpdatingLikes(false);
+            }
+            likeIt();
+        } else if (isLiked) {
+            const unLikeIt = async () => {
+                // decrement post's like count by 1 and remove user's email from post's liked_by array
+                await updateDoc(postDocRef, {
+                    likes: increment(-1),
+                    liked_by: arrayRemove(user.email)
+                });
+                setIsLiked(false);
+                setIsUpdatingLikes(false);
+            }
+            unLikeIt();
+        }
+    };
+
     return (
         <>
             {
@@ -154,6 +185,13 @@ function PostDetails() {
                     <div>{`post details are : ${post?.details}`}</div>
                     <br />
                     <strong onClick={() => setOpenEdit(true)}>Edit</strong>
+                    <br />
+                    <strong
+                        aria-disabled={isUpdatingLikes}
+                        onClick={likePost}
+                    >
+                        Like
+                    </strong>
                     <br />
                     <strong onClick={handleDelete}>Delete Post!</strong>
                     <br />

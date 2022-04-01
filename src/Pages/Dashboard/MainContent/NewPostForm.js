@@ -45,6 +45,7 @@ function NewPostForm() {
         instructor_ans: '',
         student_ans: '',
         likes: 0,
+        liked_by: [],
         total_comments: 0,
         show_name_as: '',
     });

@@ -1,17 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { StyledPostCard } from '../styled/PostList.styled';
 import { selectUser } from '../../features/user/userSlice';
 import CommentForm from './CommentForm';
+import { useParams } from 'react-router-dom';
+import { selectCurrentClass } from '../../features/classes/classSlice';
+import { getDocRefById } from '../../firebase/firebase-firestore';
+import { arrayRemove, arrayUnion, increment, updateDoc } from 'firebase/firestore';
 
 function Comment({ comment, replies, addComment, deleteComment, updateComment, activeComment, setActiveComment, parentId = null, }) {
     const user = useSelector(selectUser);
+    const { p_id } = useParams();
+    const currentClass = useSelector(selectCurrentClass);
     const canReply = Boolean(user?.uid);
     const canEdit = user.email === comment.created_by;
     const canDelete = user.email === comment.created_by;
     const isReplying = activeComment && activeComment.type === 'replying' && activeComment.id === comment.id;
     const isEditing = activeComment && activeComment.type === 'editing' && activeComment.id === comment.id;
     const replyId = parentId ? parentId : comment.id;
+
+    const isLikedByMe = comment.liked_by.includes(user.email);
+    const [isLiked, setIsLiked] = useState(isLikedByMe);
+    const [isUpdatingLikes, setIsUpdatingLikes] = useState(false);
+
+    const likeComment = () => {
+        const commentDocRef = getDocRefById(comment.id, `classes/${currentClass.c_id}/posts/${p_id}/comments`);
+        setIsUpdatingLikes(true);
+        if (!isLiked) {
+            const likeIt = async () => {
+                // increment comment's like count by 1 and store user's email in comment's liked_by array
+                await updateDoc(commentDocRef, {
+                    likes: increment(1),
+                    liked_by: arrayUnion(user.email)
+                });
+                setIsLiked(true);
+                setIsUpdatingLikes(false);
+            }
+            likeIt();
+        } else if (isLiked) {
+            const unLikeIt = async () => {
+                // decrement comment's like count by 1 and remove user's email from comment's liked_by array
+                await updateDoc(commentDocRef, {
+                    likes: increment(-1),
+                    liked_by: arrayRemove(user.email)
+                });
+                setIsLiked(false);
+                setIsUpdatingLikes(false);
+            }
+            unLikeIt();
+        }
+    };
 
     return (
         <>
@@ -25,6 +63,13 @@ function Comment({ comment, replies, addComment, deleteComment, updateComment, a
                         parentId : {comment.parent_id}
                         <br />
                         commentId : {comment.id}
+                        <br />
+                        <strong
+                            aria-disabled={isUpdatingLikes}
+                            onClick={likeComment}
+                        >
+                            Like
+                        </strong>
                     </div>
                 }
                 {isEditing && (
