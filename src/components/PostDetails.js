@@ -33,6 +33,11 @@ function PostDetails() {
     const isLikedByMe = post?.liked_by.includes(user.email);
     const [isLiked, setIsLiked] = useState(isLikedByMe);
     const [isUpdatingLikes, setIsUpdatingLikes] = useState(false);
+    const [studAns, setStudAns] = useState(post?.student_ans)
+    const [instructorAns, setInstructorAns] = useState(post?.instructor_ans)
+    const isInstructor = currentClass?.instructors_list?.includes(user.email);
+    const [updatingStudAns, setUpdatingStudAns] = useState(false);
+    const [updatingInstructorAns, setUpdatingInstructorAns] = useState(false);
 
     const discussions = currentClass?.discussions.map(discussion => ({
         value: discussion,
@@ -187,6 +192,32 @@ function PostDetails() {
         }
     };
 
+    const submitStudAns = (e) => {
+        e.preventDefault();
+        setUpdatingStudAns(true);
+        const postDocRef = getDocRefById(post.p_id, `classes/${currentClass.c_id}/posts`);
+        const updateIt = async () => {
+            await updateDoc(postDocRef, {
+                student_ans: studAns,
+            });
+            setUpdatingStudAns(false);
+        }
+        updateIt();
+    };
+
+    const submitInstructorAns = (e) => {
+        e.preventDefault();
+        setUpdatingInstructorAns(true);
+        const postDocRef = getDocRefById(post.p_id, `classes/${currentClass.c_id}/posts`);
+        const updateIt = async () => {
+            await updateDoc(postDocRef, {
+                instructor_ans: instructorAns,
+            });
+            setUpdatingInstructorAns(false);
+        }
+        updateIt();
+    };
+
     return (
         <>
             {
@@ -196,8 +227,6 @@ function PostDetails() {
                     <div>{`post id from params here : ${p_id}`}</div>
                     <div>{`post details are : ${post?.details}`}</div>
                     <br />
-                    <strong onClick={() => setOpenEdit(true)}>Edit</strong>
-                    <br />
                     <strong
                         aria-disabled={isUpdatingLikes}
                         onClick={likePost}
@@ -205,8 +234,46 @@ function PostDetails() {
                         Like : {post?.likes}
                     </strong>
                     <br />
-                    <strong onClick={handleDelete}>Delete Post!</strong>
-                    <br />
+                    {
+                        post?.created_by === user.email
+                        &&
+                        <>
+                            <strong onClick={() => setOpenEdit(true)}>Edit</strong>
+                            <br />
+                            <strong onClick={handleDelete}>Delete Post!</strong>
+                            <br />
+                        </>
+                    }
+                    <form onSubmit={submitStudAns}>
+                        <div>
+                            <textarea
+                                disabled={(isInstructor)}
+                                cols="30"
+                                rows="10"
+                                placeholder="Students answer here!"
+                                name="stud_ans"
+                                value={studAns}
+                                onChange={(e) => setStudAns(e.target.value)}
+                            >
+                            </textarea>
+                        </div>
+                        {!isInstructor && <button disabled={updatingStudAns} type='submit'>Save</button>}
+                    </form>
+                    <form onSubmit={submitInstructorAns}>
+                        <div>
+                            <textarea
+                                disabled={(!isInstructor)}
+                                cols="30"
+                                rows="10"
+                                placeholder="Instructors answer here!"
+                                name="inst_ans"
+                                value={instructorAns}
+                                onChange={(e) => setInstructorAns(e.target.value)}
+                            >
+                            </textarea>
+                        </div>
+                        {isInstructor && <button disabled={updatingInstructorAns} type='submit'>Save</button>}
+                    </form>
                     <Comments />
                 </>
             }
