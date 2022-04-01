@@ -8,7 +8,7 @@ import Comment from './Comment';
 import CommentForm from './CommentForm';
 import { v4 as uuidV4 } from 'uuid';
 
-function Comments() {
+function Comments({ postType }) {
     const user = useSelector(selectUser);
     const { c_id, p_id } = useParams();
     const [backendComments, setBackendComments] = useState([]);
@@ -213,6 +213,7 @@ function Comments() {
             <br />
             <div>Comment Form</div>
             <CommentForm
+                postType={postType}
                 submitLabel={"COMMENT"}
                 handleSubmit={(showName, text) => addComment(showName, text)}
             />
@@ -223,6 +224,7 @@ function Comments() {
                     {rootComments.map((rootComment) => (
                         <Comment
                             key={rootComment.id}
+                            postType={postType}
                             comment={rootComment}
                             replies={getReplies(rootComment.id)}
                             addComment={addComment}

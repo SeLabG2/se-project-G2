@@ -4,7 +4,7 @@ import Select from 'react-select';
 import { selectCurrentClass } from '../../features/classes/classSlice';
 import { selectUser } from '../../features/user/userSlice';
 
-function CommentForm({ submitLabel, handleSubmit, hasCancelButton = false, initialText = '', handleCancel }) {
+function CommentForm({ postType, submitLabel, handleSubmit, hasCancelButton = false, initialText = '', handleCancel }) {
     const [text, setText] = useState(initialText);
     const user = useSelector(selectUser);
     const currentClass = useSelector(selectCurrentClass);
@@ -26,6 +26,7 @@ function CommentForm({ submitLabel, handleSubmit, hasCancelButton = false, initi
     };
     return <form onSubmit={onSubmit}>
         <textarea
+            disabled={postType === 'note'}
             value={text}
             onChange={(e) => setText(e.target.value)}
         />

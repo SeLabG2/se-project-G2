@@ -274,7 +274,7 @@ function PostDetails() {
                         </div>
                         {isInstructor && <button disabled={updatingInstructorAns} type='submit'>Save</button>}
                     </form>
-                    <Comments />
+                    <Comments postType={post?.type} />
                 </>
             }
             {

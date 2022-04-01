@@ -10,6 +10,7 @@ import { arrayRemove, arrayUnion, increment, updateDoc } from 'firebase/firestor
 
 function Comment({
     comment,
+    postType,
     replies,
     addComment,
     deleteComment,
@@ -91,8 +92,15 @@ function Comment({
                     />
                 )}
                 <br />
-                {canReply && <div onClick={() => { setActiveComment({ id: comment.id, type: "replying" }) }}>Reply</div>}
-                {canEdit && <div onClick={() => { setActiveComment({ id: comment.id, type: "editing" }) }}>Edit</div>}
+                {
+                    postType !== 'note'
+                    &&
+                    <>
+                        {canReply && <div onClick={() => { setActiveComment({ id: comment.id, type: "replying" }) }}>Reply</div>}
+                        {canEdit && <div onClick={() => { setActiveComment({ id: comment.id, type: "editing" }) }}>Edit</div>}
+                    </>
+                }
+
                 {canDelete && <div onClick={() => { deleteComment(comment.id) }}>Delete</div>}
             </StyledPostCard>
             {isReplying && (
@@ -107,6 +115,7 @@ function Comment({
                         <Comment
                             key={reply.id}
                             comment={reply}
+                            postType={postType}
                             replies={[]}
                             addComment={addComment}
                             deleteComment={deleteComment}
