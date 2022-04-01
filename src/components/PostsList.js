@@ -22,44 +22,55 @@ function PostsList() {
 
     useEffect(() => {
         if (currentClass != undefined || currentClass !== null) {
-            console.log('currentclass id :', currentClass.c_id);
-            const postColRef = getColRef(`classes/${currentClass?.c_id}/posts`);
-            const postQuery = query(
-                postColRef,
-                orderBy('created_at', 'desc')
-            );
 
-            const unsubscribe = onSnapshot(postQuery, (snapshot) => {
-                const promises = snapshot.docs.map((doc) => {
-                    return { ...doc.data(), p_id: doc.id };
-                });
-                Promise.all(promises)
-                    .then((posts) => {
-                        if (currentClass != undefined || currentClass !== null) {
-                            dispatch(getPosts(posts));
-                            console.log('all the posts are : ', posts);
-                            if (posts.length !== 0) {
-                                if (currentDiscussion === '') {
-                                    setFilteredPosts([...posts]);
-                                } else {
-                                    setFilteredPosts(posts.filter(post => {
-                                        post?.discussion_list.includes(currentDiscussion);
-                                    }));
-                                }
-                            }
-                        } else {
-                            dispatch(resetPosts());
-                        }
-                        setArePostsLoading(false);
-                    })
-                    .catch((err) => {
-                        console.log(err.message);
-                    })
-            });
+            if (allPosts.length !== 0) {
+                if (currentDiscussion === '') {
+                    setFilteredPosts([...allPosts]);
+                } else {
+                    setFilteredPosts(allPosts.filter(post => {
+                        post?.discussion_list.includes(currentDiscussion);
+                    }));
+                }
+            }
 
-            return unsubscribe;
+            // console.log('currentclass id :', currentClass.c_id);
+            // const postColRef = getColRef(`classes/${currentClass?.c_id}/posts`);
+            // const postQuery = query(
+            //     postColRef,
+            //     orderBy('created_at', 'desc')
+            // );
+
+            // const unsubscribe = onSnapshot(postQuery, (snapshot) => {
+            //     const promises = snapshot.docs.map((doc) => {
+            //         return { ...doc.data(), p_id: doc.id };
+            //     });
+            //     Promise.all(promises)
+            //         .then((posts) => {
+            //             if (currentClass != undefined || currentClass !== null) {
+            //                 dispatch(getPosts(posts));
+            //                 console.log('all the posts are : ', posts);
+            //                 if (posts.length !== 0) {
+            //                     if (currentDiscussion === '') {
+            //                         setFilteredPosts([...posts]);
+            //                     } else {
+            //                         setFilteredPosts(posts.filter(post => {
+            //                             post?.discussion_list.includes(currentDiscussion);
+            //                         }));
+            //                     }
+            //                 }
+            //             } else {
+            //                 dispatch(resetPosts());
+            //             }
+            //             setArePostsLoading(false);
+            //         })
+            //         .catch((err) => {
+            //             console.log(err.message);
+            //         })
+            // });
+
+            // return unsubscribe;
         }
-    }, [currentClass])
+    }, [currentClass, allPosts])
 
     useEffect(() => {
         console.log('all posts : ', allPosts);

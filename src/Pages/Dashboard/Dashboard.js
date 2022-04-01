@@ -10,6 +10,7 @@ import { Route, Routes, useNavigate } from 'react-router-dom';
 import { toggleContent } from '../../features/mainContentToggle/mainContentToggleSlice';
 import { onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { getColRef } from '../../firebase/firebase-firestore';
+import { getPosts, resetPosts, selectCurrentDiscussion } from '../../features/posts/postSlice';
 
 function Dashboard() {
     const user = useSelector(selectUser);
@@ -18,6 +19,8 @@ function Dashboard() {
     const [isCurrentClassLoading, setIsCurrentClassLoading] = useState(true);
     const joinedClasses = useSelector(selectJoinedClasses);
     const currentClass = useSelector(selectCurrentClass);
+    const currentDiscussion = useSelector(selectCurrentDiscussion);
+    const [arePostsLoading, setArePostsLoading] = useState(true);
 
     useEffect(() => {
         const classColRef = getColRef('classes');
@@ -63,14 +66,44 @@ function Dashboard() {
 
     useEffect(() => {
         if (!isCurrentClassLoading) {
-
-            console.log('the joinedClasses are : ', joinedClasses);
-            console.log('the current class is : ', currentClass);
             if (currentClass != undefined && currentClass !== null) {
                 navigate(currentClass?.c_id);
             }
         }
     }, [isCurrentClassLoading]);
+
+    useEffect(() => {
+        console.log('inside change class useeffect');
+        if (currentClass != undefined || currentClass !== null) {
+            console.log('currentclass id :', currentClass.c_id);
+            const postColRef = getColRef(`classes/${currentClass?.c_id}/posts`);
+            const postQuery = query(
+                postColRef,
+                orderBy('created_at', 'desc')
+            );
+
+            const unsubscribe = onSnapshot(postQuery, (snapshot) => {
+                const promises = snapshot.docs.map((doc) => {
+                    return { ...doc.data(), p_id: doc.id };
+                });
+                Promise.all(promises)
+                    .then((posts) => {
+                        if (currentClass != undefined || currentClass !== null) {
+                            dispatch(getPosts(posts));
+                            console.log('all the posts are : ', posts);
+                        } else {
+                            dispatch(resetPosts());
+                        }
+                        setArePostsLoading(false);
+                    })
+                    .catch((err) => {
+                        console.log(err.message);
+                    })
+            });
+
+            return unsubscribe;
+        }
+    }, [currentClass])
 
     useEffect(() => {
         dispatch(toggleContent('other'));

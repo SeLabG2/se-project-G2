@@ -59,6 +59,7 @@ function ManageEnrollment() {
             })
                 .then(() => {
                     console.log('updated attendance list successfully.');
+                    setAttendanceList('');
                     setIsLoading(false);
                 })
                 .catch(err => {

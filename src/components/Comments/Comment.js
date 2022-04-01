@@ -8,7 +8,16 @@ import { selectCurrentClass } from '../../features/classes/classSlice';
 import { getDocRefById } from '../../firebase/firebase-firestore';
 import { arrayRemove, arrayUnion, increment, updateDoc } from 'firebase/firestore';
 
-function Comment({ comment, replies, addComment, deleteComment, updateComment, activeComment, setActiveComment, parentId = null, }) {
+function Comment({
+    comment,
+    replies,
+    addComment,
+    deleteComment,
+    updateComment,
+    activeComment,
+    setActiveComment,
+    parentId = null,
+}) {
     const user = useSelector(selectUser);
     const { p_id } = useParams();
     const currentClass = useSelector(selectCurrentClass);
@@ -68,7 +77,7 @@ function Comment({ comment, replies, addComment, deleteComment, updateComment, a
                             aria-disabled={isUpdatingLikes}
                             onClick={likeComment}
                         >
-                            Like
+                            Like : {comment.likes}
                         </strong>
                     </div>
                 }

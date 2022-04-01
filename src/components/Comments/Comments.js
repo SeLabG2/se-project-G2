@@ -33,7 +33,7 @@ function Comments() {
             setBackendComments(allComments);
         }
         loadComments();
-    }, [p_id]);
+    }, [p_id, backendComments]);
 
     const getReplies = commentId => {
         const replies = backendComments.filter(backendComment => backendComment?.parent_id === commentId);
@@ -209,17 +209,17 @@ function Comments() {
 
     return (
         <>
+            <strong>Comments</strong>
+            <br />
+            <div>Comment Form</div>
+            <CommentForm
+                submitLabel={"COMMENT"}
+                handleSubmit={(showName, text) => addComment(showName, text)}
+            />
             {
                 !isLoading
                 &&
                 <>
-                    <strong>Comments</strong>
-                    <br />
-                    <div>Comment Form</div>
-                    <CommentForm
-                        submitLabel={"COMMENT"}
-                        handleSubmit={(showName, text) => addComment(showName, text)}
-                    />
                     {rootComments.map((rootComment) => (
                         <Comment
                             key={rootComment.id}

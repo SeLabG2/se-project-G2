@@ -11,14 +11,26 @@ import { selectCurrentClass } from '../features/classes/classSlice';
 import { selectUser } from '../features/user/userSlice';
 
 function PostDetails() {
+
+    useEffect(() => {
+        // in case the posts aren't fetched
+        // then to prevent app from crashing, just navigate back to dashboard
+        // after that all posts will be loaded and you can view all of them successfully
+        // but the downside is that if you were already doing something, it won't be saved
+        if (allPosts == undefined || allPosts.length === 0) {
+            navigate('/');
+        }
+    }, []);
+
+    // variables below
     const { c_id, p_id } = useParams();
     const allPosts = useSelector(selectAllPosts);
-    const post = allPosts.filter(p => p.p_id === p_id)[0];
+    const post = allPosts?.filter(p => p.p_id === p_id)[0];
     const navigate = useNavigate();
     const [openEdit, setOpenEdit] = useState(false);
     const currentClass = useSelector(selectCurrentClass);
     const user = useSelector(selectUser);
-    const isLikedByMe = post.liked_by.includes(user.email);
+    const isLikedByMe = post?.liked_by.includes(user.email);
     const [isLiked, setIsLiked] = useState(isLikedByMe);
     const [isUpdatingLikes, setIsUpdatingLikes] = useState(false);
 
@@ -42,8 +54,8 @@ function PostDetails() {
     }
 
     const initialShowName = {
-        value: post.show_name_as,
-        label: post.show_name_as
+        value: post?.show_name_as,
+        label: post?.show_name_as
     };
     const [showName, setShowName] = useState(initialShowName);
     const [isValidationComplete, setIsValidationComplete] = useState(false);
@@ -51,11 +63,11 @@ function PostDetails() {
 
     const initialFormData = {
         updated_at: serverTimestamp(),
-        type: post.type,
-        summary: post.summary,
-        details: post.details,
+        type: post?.type,
+        summary: post?.summary,
+        details: post?.details,
         discussion_list: [],
-        show_name_as: post.show_name_as,
+        show_name_as: post?.show_name_as,
     };
     const [formData, setFormData] = useState(initialFormData);
 
@@ -190,7 +202,7 @@ function PostDetails() {
                         aria-disabled={isUpdatingLikes}
                         onClick={likePost}
                     >
-                        Like
+                        Like : {post?.likes}
                     </strong>
                     <br />
                     <strong onClick={handleDelete}>Delete Post!</strong>
