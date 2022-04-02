@@ -10,7 +10,7 @@ import { PostListContainer, StyledPostCard } from './styled/PostList.styled';
 import { resetDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
 import { hideSidebar } from '../features/sidebar/sidebarSlice';
 
-function PostsList() {
+function PostsList({ searchTerm }) {
     const dispatch = useDispatch();
     const allPosts = useSelector(selectAllPosts);
     const currentDiscussion = useSelector(selectCurrentDiscussion);
@@ -19,6 +19,28 @@ function PostsList() {
     const { c_id } = useParams();
     const [arePostsLoading, setArePostsLoading] = useState(true);
     const [filteredPosts, setFilteredPosts] = useState([]);
+
+    useEffect(() => {
+        if (searchTerm !== '') {
+            // returns all posts whose summary and details contain search term
+            setFilteredPosts(allPosts.filter(post => {
+                return (post?.summary.toLowerCase().includes(searchTerm.toLowerCase())
+                    ||
+                    post?.details.toLowerCase().includes(searchTerm.toLowerCase()));
+            }));
+        } else {
+            // show the posts from current discussion
+            if (currentDiscussion === '') {
+                setFilteredPosts([...allPosts]);
+            } else {
+                const newPostList = allPosts.filter(post => {
+                    const isPresent = post?.discussion_list.includes(currentDiscussion);
+                    return isPresent;
+                });
+                setFilteredPosts(newPostList);
+            }
+        }
+    }, [searchTerm]);
 
     useEffect(() => {
         if (currentClass != undefined || currentClass !== null) {
@@ -101,7 +123,7 @@ function PostsList() {
                                 navigate(`/dashboard/${c_id}/${post.p_id}`)
                             }}
                         >
-                            {`post summary : ${post.summary} and class id from params here : ${c_id}`}
+                            {`post summary : ${post.summary}`}
                         </StyledPostCard>
                     ))
                     :

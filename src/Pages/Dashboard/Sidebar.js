@@ -8,6 +8,7 @@ import { selectSidebarStatus, toggleSidebar } from '../../features/sidebar/sideb
 function Sidebar() {
     const showSidebar = useSelector(selectSidebarStatus);
     const dispatch = useDispatch();
+    const [searchTerm, setSearchTerm] = useState('');
 
     return (
         <>
@@ -34,8 +35,13 @@ function Sidebar() {
                 </CloseMenuIcon>
             }
             <SidebarContainer className={(showSidebar) ? "" : "sidebar-is-closed"}>
-                <DashboardSearch />
-                <PostsList />
+                <DashboardSearch
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                />
+                <PostsList
+                    searchTerm={searchTerm}
+                />
             </SidebarContainer>
         </>
     );

@@ -13,7 +13,7 @@ import { selectCurrentClass, selectJoinedClasses } from '../features/classes/cla
 import { hideSidebar } from '../features/sidebar/sidebarSlice';
 
 
-function DashboardSearch() {
+function DashboardSearch({ searchTerm, setSearchTerm }) {
     const dispatch = useDispatch();
     const joinedClasses = useSelector(selectJoinedClasses);
     const currentClass = useSelector(selectCurrentClass);
@@ -35,7 +35,12 @@ function DashboardSearch() {
     return (
         <SearchBarContainer>
             <SearchBox>
-                <SearchInput type="" placeholder="Search" />
+                <SearchInput
+                    type=""
+                    placeholder="Search"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
                 <SearchIcon xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </SearchIcon>
