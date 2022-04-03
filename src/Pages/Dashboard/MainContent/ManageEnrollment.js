@@ -3,8 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentClass } from '../../../features/classes/classSlice';
 import { getDocRefById } from '../../../firebase/firebase-firestore';
+import { selectUser } from '../../../features/user/userSlice';
 
 function ManageEnrollment() {
+    const user = useSelector(selectUser);
     const currentClass = useSelector(selectCurrentClass);
     const [joinedUsersList, setJoinedUsersList] = useState(currentClass.joined_users);
     const [attendanceList, setAttendanceList] = useState('');
@@ -15,6 +17,12 @@ function ManageEnrollment() {
     }, [currentClass]);
 
     const handleDrop = (joined_user_list) => {
+        if (joined_user_list[0] === user.email) {
+            const userWannaLeave = window.confirm('Are you sure you want to leave this class?');
+            if (!userWannaLeave) {
+                return
+            }
+        }
         const classDocRef = getDocRefById(currentClass.c_id, 'classes');
         console.log('joined_user_list : ', joined_user_list);
         updateDoc(classDocRef, {

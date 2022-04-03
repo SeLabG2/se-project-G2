@@ -76,7 +76,6 @@ function Comments({ postType }) {
                         const individualStatsDocRef = getDocRefById(id, `classes/${c_id}/individual_stats`);
                         await setDoc(individualStatsDocRef, {
                             user: user.email,
-                            total_posts: increment(1),
                             total_contributions: increment(1)
                         }, { merge: true });
                     }

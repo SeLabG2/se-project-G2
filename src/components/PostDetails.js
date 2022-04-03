@@ -38,6 +38,7 @@ function PostDetails() {
     const isInstructor = currentClass?.instructors_list?.includes(user.email);
     const [updatingStudAns, setUpdatingStudAns] = useState(false);
     const [updatingInstructorAns, setUpdatingInstructorAns] = useState(false);
+    const [showSaveBtn, setShowSaveBtn] = useState(false);
 
     const discussions = currentClass?.discussions.map(discussion => ({
         value: discussion,
@@ -202,6 +203,7 @@ function PostDetails() {
                 student_ans: studAns,
             });
             setUpdatingStudAns(false);
+            setShowSaveBtn(false);
         }
         updateIt();
     };
@@ -215,6 +217,7 @@ function PostDetails() {
                 instructor_ans: instructorAns,
             });
             setUpdatingInstructorAns(false);
+            setShowSaveBtn(false);
         }
         updateIt();
     };
@@ -244,37 +247,63 @@ function PostDetails() {
                             <br />
                         </>
                     }
-                    <form onSubmit={submitStudAns}>
-                        <div>
-                            <textarea
-                                disabled={(isInstructor)}
-                                cols="30"
-                                rows="10"
-                                placeholder="Students answer here!"
-                                name="stud_ans"
-                                value={studAns}
-                                onChange={(e) => setStudAns(e.target.value)}
-                            >
-                            </textarea>
-                        </div>
-                        {!isInstructor && <button disabled={updatingStudAns} type='submit'>Save</button>}
-                    </form>
-                    <form onSubmit={submitInstructorAns}>
-                        <div>
-                            <textarea
-                                disabled={(!isInstructor)}
-                                cols="30"
-                                rows="10"
-                                placeholder="Instructors answer here!"
-                                name="inst_ans"
-                                value={instructorAns}
-                                onChange={(e) => setInstructorAns(e.target.value)}
-                            >
-                            </textarea>
-                        </div>
-                        {isInstructor && <button disabled={updatingInstructorAns} type='submit'>Save</button>}
-                    </form>
-                    <Comments postType={post?.type} />
+                    {
+                        post?.type === 'question'
+                        &&
+                        <>
+                            <form onSubmit={submitStudAns}>
+                                <div>
+                                    <textarea
+                                        disabled={(isInstructor)}
+                                        cols="30"
+                                        rows="10"
+                                        placeholder="Students answer here!"
+                                        name="stud_ans"
+                                        value={studAns}
+                                        onChange={(e) => setStudAns(e.target.value)}
+                                        onFocus={() => setShowSaveBtn(true)}
+                                    >
+                                    </textarea>
+                                </div>
+                                {
+                                    !isInstructor && showSaveBtn
+                                    &&
+                                    <>
+                                        <button disabled={updatingStudAns} type='submit'>Save</button>
+                                        <button onClick={() => setShowSaveBtn(false)}>Cancel</button>
+                                    </>
+                                }
+                            </form>
+                            <form onSubmit={submitInstructorAns}>
+                                <div>
+                                    <textarea
+                                        disabled={(!isInstructor)}
+                                        cols="30"
+                                        rows="10"
+                                        placeholder="Instructors answer here!"
+                                        name="inst_ans"
+                                        value={instructorAns}
+                                        onChange={(e) => setInstructorAns(e.target.value)}
+                                        onFocus={() => setShowSaveBtn(true)}
+                                    >
+                                    </textarea>
+                                </div>
+                                {
+                                    isInstructor && showSaveBtn
+                                    &&
+                                    <>
+                                        <button disabled={updatingInstructorAns} type='submit'>Save</button>
+                                        <button onClick={() => setShowSaveBtn(false)}>Cancel</button>
+                                    </>
+                                }
+                            </form>
+                        </>
+                    }
+                    {
+                        post?.type === 'question'
+                        &&
+                        <Comments postType={post?.type} />
+                    }
                 </>
             }
             {
