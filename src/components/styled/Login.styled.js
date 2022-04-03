@@ -26,7 +26,7 @@ const StyledForm = styled.form`
 const StyledFormDiv = styled.div`
     position: relative;
     height: var(--input-field-size);
-    margin-bottom: 3em;
+    margin-bottom: 2.5em;
 `
 
 

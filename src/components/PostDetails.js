@@ -86,6 +86,13 @@ function PostDetails() {
         }
     };
 
+    useEffect(() => {
+        setStudAns(post?.student_ans);
+        setInstructorAns(post?.instructor_ans);
+        setFormData(initialFormData);
+        setOpenEdit(false);
+    }, [post?.p_id]);
+
     const onChange = (e) => {
         setFormData((prevState) => ({
             ...prevState,

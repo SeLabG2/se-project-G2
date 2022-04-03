@@ -91,6 +91,7 @@ function SignUp() {
         { value: 'instructor', label: 'instructor' },
         { value: 'student', label: 'student' }
     ];
+    const [isSelectingUni, setIsSelectingUni] = useState(false);
 
     useEffect(() => {
         // gets all universities from database
@@ -134,10 +135,7 @@ function SignUp() {
 
 
     useEffect(() => {
-        console.log('validation status : ', isValidationComplete);
-        if (formErrors == undefined
-            && formErrors === null
-            && JSON.stringify(formErrors) === '{}') {
+        if (JSON.stringify(formErrors) === '{}') {
 
             if (isValidationComplete) {
                 // get id of university
@@ -195,8 +193,7 @@ function SignUp() {
             errors.password = 'Password is required';
         } else if (data.password.length < 6) {
             errors.password = 'Password should be at least 6 characters long';
-        }
-        if (data.confirmPassword !== data.password) {
+        } else if (data.confirmPassword !== data.password) {
             errors.confirmPassword = 'Passwords should match';
         }
         return errors;
@@ -205,14 +202,13 @@ function SignUp() {
     const onSubmit = async (e) => {
         e.preventDefault();
         // validate the form here
-        console.log(formData);
         setFormErrors(validate(formData));
 
         // now just create new user and store them in firebase
         setIsValidationComplete(true);
     };
 
-    console.log(university);
+
     return (
         <>
             <StyledFormWrapper>
@@ -237,19 +233,14 @@ function SignUp() {
                             <StyledFormDiv>
                                 <Select
                                     options={filteredUniList}
+                                    value={(university.length > 0) ? { value: university, label: university } : null}
                                     onChange={(e) => {
                                         setFormData((prevState) => ({
                                             ...prevState,
                                             ['university']: (e) ? e.value : '',
                                         }));
                                     }}
-                                    onInputChange={(inputValue) => {
-                                        setFormData((prevState) => ({
-                                            ...prevState,
-                                            ['university']: inputValue
-                                        }));
-                                    }}
-                                    placeholder={university}
+                                    placeholder=''
                                     isClearable
                                     isSearchable
                                     noOptionsMessage={() => 'No such University found'}
@@ -259,6 +250,7 @@ function SignUp() {
                                 </div>
                             </StyledFormDiv>
                             <StyledButton
+                                type='button'
                                 onClick={() => {
                                     const errors = validateUni();
                                     setFormErrors(errors);
@@ -278,13 +270,14 @@ function SignUp() {
                             <StyledFormDiv>
                                 <Select
                                     options={roleOptions}
+                                    value={(role.length > 0) ? { value: role, label: role } : null}
                                     onChange={(e) => {
                                         setFormData((prevState) => ({
                                             ...prevState,
                                             ['role']: (e) ? e.value : '',
                                         }));
                                     }}
-                                    placeholder={role}
+                                    placeholder=''
                                     isClearable
                                     isSearchable
                                     noOptionsMessage={() => 'No such role exist'}
@@ -294,6 +287,7 @@ function SignUp() {
                                 </div>
                             </StyledFormDiv>
                             <StyledButton
+                                type='button'
                                 onClick={() => {
                                     const errors = validateRole();
                                     setFormErrors(errors);
@@ -325,10 +319,10 @@ function SignUp() {
                                 >
                                     Username
                                 </StyledLabel>
-                                <div>
-                                    <p>{formErrors.username}</p>
-                                </div>
                             </StyledFormDiv>
+                            <div>
+                                <p>{formErrors.username}</p>
+                            </div>
                             <StyledFormDiv>
                                 <StyledInput
                                     type="text"
@@ -344,10 +338,10 @@ function SignUp() {
                                 >
                                     Email
                                 </StyledLabel>
-                                <div>
-                                    <p>{formErrors.email}</p>
-                                </div>
                             </StyledFormDiv>
+                            <div>
+                                <p>{formErrors.email}</p>
+                            </div>
                             <StyledFormDiv>
                                 <StyledInput
                                     type="password"
@@ -363,10 +357,10 @@ function SignUp() {
                                 >
                                     Password
                                 </StyledLabel>
-                                <div>
-                                    <p>{formErrors.password}</p>
-                                </div>
                             </StyledFormDiv>
+                            <div>
+                                <p>{formErrors.password}</p>
+                            </div>
                             <StyledFormDiv>
                                 <StyledInput
                                     type="password"
@@ -382,10 +376,10 @@ function SignUp() {
                                 >
                                     Confirm Password
                                 </StyledLabel>
-                                <div>
-                                    <p>{formErrors.confirmPassword}</p>
-                                </div>
                             </StyledFormDiv>
+                            <div>
+                                <p>{formErrors.confirmPassword}</p>
+                            </div>
                             <StyledButton disabled={isLoading} type="submit">Sign-Up</StyledButton>
                         </section>
                     )}

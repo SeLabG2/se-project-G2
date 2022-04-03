@@ -17,6 +17,7 @@ function Login() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [formErrors, setFormErrors] = useState({});
+    const [isValidationComplete, setIsValidationComplete] = useState(false);
 
     useEffect(() => {
         if (isError) {
@@ -38,6 +39,16 @@ function Login() {
         dispatch(reset());
     }, [user, isError, isSuccess, message, navigate, dispatch]);
 
+    useEffect(() => {
+        if (JSON.stringify(formErrors) === '{}') {
+            if (isValidationComplete) {
+                dispatch(login(formData));
+            }
+        } else {
+            setIsValidationComplete(false);
+        }
+    }, [isValidationComplete]);
+
     const onChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevState) => ({
@@ -46,15 +57,27 @@ function Login() {
         }));
     };
 
-    const validate = (formData) => {
+    const validate = (data) => {
+        const errors = {};
+        const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i;
+
+        if (!data.email) {
+            errors.email = 'Email is required';
+        } else if (!regex.test(data.email)) {
+            errors.email = 'Email is invalid. Enter e.g test@test.com';
+        }
+        if (!data.password) {
+            errors.password = 'Password is required';
+        }
+        return errors;
     };
 
     const onSubmit = async (e) => {
         e.preventDefault();
 
-        // setFormErrors(validate(formData));
+        setFormErrors(validate(formData));
 
-        dispatch(login(formData));
+        setIsValidationComplete(true);
     };
 
     const { email, password } = formData;
@@ -66,7 +89,7 @@ function Login() {
                     <StyledTitle>Welcome!</StyledTitle>
                     <StyledFormDiv>
                         <StyledInput
-                            type="email"
+                            type="text"
                             id="email"
                             placeholder=" "
                             name="email"
@@ -75,6 +98,9 @@ function Login() {
                         />
                         <StyledLabel className="form__label" htmlFor="email">Email</StyledLabel>
                     </StyledFormDiv>
+                    <div>
+                        <p>{formErrors.email}</p>
+                    </div>
                     <StyledFormDiv>
                         <StyledInput
                             type="password"
@@ -86,6 +112,9 @@ function Login() {
                         />
                         <StyledLabel className="form__label" htmlFor="password">Password</StyledLabel>
                     </StyledFormDiv>
+                    <div>
+                        <p>{formErrors.password}</p>
+                    </div>
                     <StyledButton disabled={isLoading} type="submit">Login</StyledButton>
                     <p className='form__signup-para'>Don't have an account? </p>
                     <StyledLink to="/signup">Sign-up here!</StyledLink>
