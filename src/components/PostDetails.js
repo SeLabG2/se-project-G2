@@ -137,7 +137,12 @@ function PostDetails() {
         if (isValidationComplete) {
             const editPost = async () => {
                 const postDocRef = getDocRefById(post.p_id, `classes/${currentClass.c_id}/posts`);
-                await updateDoc(postDocRef, formData);
+                if (formData.type === 'note' && post?.type === 'question') {
+                    const newData = { ...formData, student_ans: '', instructor_ans: '' };
+                    await updateDoc(postDocRef, newData);
+                } else {
+                    await updateDoc(postDocRef, formData);
+                }
                 setIsLoading(false);
                 // setDiscussionList(initialFormDiscussionList);
                 // setShowName(initialShowName);
@@ -299,11 +304,7 @@ function PostDetails() {
                             </form>
                         </>
                     }
-                    {
-                        post?.type === 'question'
-                        &&
-                        <Comments postType={post?.type} />
-                    }
+                    <Comments postType={post?.type} />
                 </>
             }
             {

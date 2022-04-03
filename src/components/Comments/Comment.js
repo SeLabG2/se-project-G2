@@ -75,7 +75,7 @@ function Comment({
                         commentId : {comment.id}
                         <br />
                         <strong
-                            aria-disabled={isUpdatingLikes}
+                            disabled={isUpdatingLikes}
                             onClick={likeComment}
                         >
                             Like : {comment.likes}
