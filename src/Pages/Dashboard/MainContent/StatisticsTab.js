@@ -32,8 +32,8 @@ function StatisticsTab() {
     return (
         <div>
             <div>Overall Class Statistics</div>
-            {`total posts : ${currentClass.total_posts}\n`}
-            {`total contributions : ${currentClass.total_contributions}\n`}
+            {`total current posts : ${currentClass.total_posts}\n`}
+            {`total overall contributions : ${currentClass.total_contributions}\n`}
             {`total anonymous contributions : ${currentClass.total_anonymous_contributions}\n`}
             {`total deleted contributions : ${currentClass.total_deleted_contributions}\n`}
             <br />

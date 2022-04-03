@@ -16,6 +16,7 @@ function Login() {
     const { isLoading, isError, isSuccess, message } = useSelector(selectUserStatus);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [formErrors, setFormErrors] = useState({});
 
     useEffect(() => {
         if (isError) {
@@ -38,14 +39,20 @@ function Login() {
     }, [user, isError, isSuccess, message, navigate, dispatch]);
 
     const onChange = (e) => {
+        const { name, value } = e.target;
         setFormData((prevState) => ({
             ...prevState,
-            [e.target.name]: e.target.value,
+            [name]: value.trim(),
         }));
+    };
+
+    const validate = (formData) => {
     };
 
     const onSubmit = async (e) => {
         e.preventDefault();
+
+        // setFormErrors(validate(formData));
 
         dispatch(login(formData));
     };

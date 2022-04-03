@@ -95,6 +95,7 @@ function Comments({ postType }) {
                     const classDocRef = getDocRefById(c_id, 'classes');
                     if (showName === 'Anonymous') {
                         await updateDoc(classDocRef, {
+                            total_contributions: increment(1),
                             total_anonymous_contributions: increment(1)
                         });
                     } else {

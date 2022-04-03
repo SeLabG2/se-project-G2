@@ -94,6 +94,7 @@ function NewPostForm() {
                                 if (formData.show_name_as === 'Anonymous') {
                                     await updateDoc(classDocRef, {
                                         total_posts: increment(1),
+                                        total_contributions: increment(1),
                                         total_anonymous_contributions: increment(1)
                                     });
                                 } else {

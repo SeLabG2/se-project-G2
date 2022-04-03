@@ -121,6 +121,7 @@ function PostDetails() {
                         .then(() => {
                             const classDocRef = getDocRefById(c_id, 'classes');
                             updateDoc(classDocRef, {
+                                total_posts: increment(-1),
                                 total_deleted_contributions: increment(totalDeletedContributions)
                             })
                                 .then(navigate('/'))
