@@ -155,9 +155,10 @@ function SignUp() {
     }, [isValidationComplete]);
 
     const onChange = (e) => {
+        const { name, value } = e.target;
         setFormData((prevState) => ({
             ...prevState,
-            [e.target.name]: e.target.value,
+            [name]: value.trim(),
         }));
     };
 
