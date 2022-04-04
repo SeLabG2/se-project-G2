@@ -2,7 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
+import {
+    NavbarContainer,
+    LogoSection,
+    ButtonGroup,
+    NavList,
+    NavItem,
+    NavigationLink
+} from '../components/styled/Navbar.styled';
 import { logout, reset, selectUser, selectUserStatus } from '../features/user/userSlice';
 import ClassNavDropdown from './ClassNavDropdown';
 import { resetDropdown, selectShowDropdown, toggleDropdown } from '../features/classDropdownToggle/classDropdownToggleSlice';
@@ -21,10 +28,6 @@ function Navbar() {
     const showClassDropdown = useSelector(selectShowDropdown);
     const [storeResetDone, setStoreResetDone] = useState(false);
     const canManageClass = currentClass?.instructors_list?.includes(user.email);
-
-    useEffect(() => {
-        console.log('answer: ', canManageClass);
-    }, []);
 
     useEffect(() => {
         if (isError) {
@@ -63,34 +66,40 @@ function Navbar() {
 
     return (
         <NavbarContainer>
-            <NavigationLink
-                onClick={() => { dispatch(resetDropdown()); }}
-                className='logo'
-                to="/"
-            >
-                Logo
-            </NavigationLink>
+            <LogoSection>
 
-            {
-                user.role === "instructor"
-                &&
-                <button
-                    onClick={() => {
-                        dispatch(toggleContent('create-class'));
-                        dispatch(resetDropdown());
-                    }}
+                <NavigationLink
+                    onClick={() => { dispatch(resetDropdown()); }}
+                    className='logo'
+                    to="/"
                 >
-                    New Class
-                </button>
-            }
-            <button
-                onClick={() => {
-                    dispatch(toggleContent('join-class'));
-                    dispatch(resetDropdown());
-                }}
-            >
-                Join Class
-            </button>
+                    Logo
+                </NavigationLink>
+                <ButtonGroup>
+
+
+                    {
+                        user.role === "instructor"
+                        &&
+                        <button
+                            onClick={() => {
+                                dispatch(toggleContent('create-class'));
+                                dispatch(resetDropdown());
+                            }}
+                        >
+                            New Class
+                        </button>
+                    }
+                    <button
+                        onClick={() => {
+                            dispatch(toggleContent('join-class'));
+                            dispatch(resetDropdown());
+                        }}
+                    >
+                        Join Class
+                    </button>
+                </ButtonGroup>
+            </LogoSection>
 
             <NavList>
                 <NavItem
@@ -145,39 +154,5 @@ function Navbar() {
         </NavbarContainer>
     );
 }
-
-const NavbarContainer = styled.div`
-    position: sticky;
-    top: 0;
-    background-color: var(--primary-color);
-    padding: var(--div-padding);
-    /* border: 5px solid orange; */
-`
-
-const NavList = styled.ul`
-    list-style: none;
-`
-
-const NavItem = styled.li`
-    font-weight: var(--fw-bold);
-    cursor: pointer;
-`
-
-const NavigationLink = styled(Link)`
-    text-decoration: none;
-    color: var(--black-color);
-
-    &:hover {
-        border-bottom: 1px solid var(--secondary-color);
-    }
-
-    &:visited {
-        decoration: none;
-    }
-
-    &.logo {
-        font-weight: var(--fw-extra-bold);
-    }
-`
 
 export default Navbar;
